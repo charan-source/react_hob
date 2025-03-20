@@ -131,7 +131,7 @@ const Sidebar = ({ isSidebar }) => {
           selected={selected}
           setSelected={setSelected}
         />
-        <Item title="Organizations" to="/hob" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} />
+        <Item title="Organization" to="/hob" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Notes" to="/notes" icon={<DescriptionOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Calendar" to="/calendar" icon={<CalendarTodayOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Logout" to="/logout" icon={<LogoutOutlinedIcon />} selected={selected} setSelected={setSelected} />

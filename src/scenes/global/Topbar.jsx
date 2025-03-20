@@ -28,6 +28,8 @@ const getActivePage = (pathname) => {
     return "/notes";
   } else if (pathname.includes("/calendar")) {
     return "/calendar";
+  } else if (pathname.includes("/organization")) {
+    return "/organization";
   } else if (
     pathname === "/" ||
     pathname.includes("/allExperiences") ||
@@ -112,6 +114,8 @@ const Topbar = () => {
         return "Create a New Head of the Business Unit";
       case "/allExperiences":
         return "All Experiences";
+      case "/organization":
+        return "Organizations";
       case "/newExperiences":
         return "New Experiences";
       case "/pendingExperiences":
@@ -137,7 +141,9 @@ const Topbar = () => {
       case "/crm":
         return { primaryTitle: "Customer Relationship Manager", secondaryTitle: null };
       case "/hob":
-        return { primaryTitle: "Head of The Business", secondaryTitle: null };
+        return { primaryTitle: "Organization", secondaryTitle: null };
+      // case "/organization":
+      //     return { primaryTitle: "Organizations", secondaryTitle: null };
       case "/cmform":
         return { primaryTitle: "Customer Manager", secondaryTitle: "Create a New Customer Manager" };
       case "/crmform":
@@ -203,7 +209,7 @@ const Topbar = () => {
     </Box>
   );
 
-    
+
   return (
     <Box
       width="100%"
@@ -424,8 +430,8 @@ const Topbar = () => {
                   fontSize="small"
                   sx={{ cursor: "pointer" }}
                 />
-              
-                       <CustomDivider /> 
+
+                <CustomDivider />
                 <Typography>{getPageTitle()}</Typography>
               </Box>
             </Box>
@@ -459,63 +465,63 @@ const Topbar = () => {
                 {primaryTitle}
               </Typography>
               <Box sx={{ color: "#ffffff", alignItems: "center", gap: 1, display: "flex" }}>
-  <HomeOutlinedIcon onClick={() => navigate("/")} fontSize="small" sx={{ cursor: "pointer" }} />
-  <CustomDivider /> 
-  <Typography sx={{ cursor: "pointer" }} onClick={() => navigate(-1)}>
-    {primaryTitle}
-  </Typography>
-  {secondaryTitle && (
-    <>
-      <CustomDivider /> 
-      <Typography sx={{ cursor: "pointer" }} onClick={() => navigate(location.pathname)}>
-        {secondaryTitle}
-      </Typography>
-    </>
-  )}
-</Box>
+                <HomeOutlinedIcon onClick={() => navigate("/")} fontSize="small" sx={{ cursor: "pointer" }} />
+                <CustomDivider />
+                <Typography sx={{ cursor: "pointer" }} onClick={() => navigate(-1)}>
+                  {primaryTitle}
+                </Typography>
+                {secondaryTitle && (
+                  <>
+                    <CustomDivider />
+                    <Typography sx={{ cursor: "pointer" }} onClick={() => navigate(location.pathname)}>
+                      {secondaryTitle}
+                    </Typography>
+                  </>
+                )}
+              </Box>
             </Box>
           </Box>
         )}
       </Box>
-<Box sx={{alignItems:"center"}}>
-      {/* Mobile Sidebar Modal */}
-      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-          sx: { backgroundColor: "rgba(0, 0, 0, 0.5)" }, // Semi-transparent black backdrop
-        }}
-      >
-        <Box
-          width="100%"
+      <Box sx={{ alignItems: "center" }}>
+        {/* Mobile Sidebar Modal */}
+        <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}
           sx={{
-            background: colors.primary[400],
-            height: "100vh",
-            position: "absolute",
-            left: 0,
-            top: "10%",
-            padding: "20px",
             display: "flex",
-            flexDirection: "column",
+            justifyContent: "center",
             alignItems: "center",
-            overflow: "hidden",
-            boxShadow: "4px 0px 8px rgba(0, 0, 0, 0.2)",
+          }}
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+            sx: { backgroundColor: "rgba(0, 0, 0, 0.5)" }, // Semi-transparent black backdrop
           }}
         >
-          <Item title="Dashboard" to="/" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
-          <Item title="Customer Manager" to="/cm" icon={<PeopleAltOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
-          <Item title="Customer Relationship Manager" to="/crm" icon={<HandshakeOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
-          <Item title="Organizations" to="/hob" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
-          <Item title="Notes" to="/notes" icon={<DescriptionOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
-          <Item title="Calendar" to="/calendar" icon={<CalendarTodayOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
-          <Item title="Logout" to="/logout" icon={<LogoutOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
-        </Box>
-      </Modal>
+          <Box
+            width="100%"
+            sx={{
+              background: colors.primary[400],
+              height: "100vh",
+              position: "absolute",
+              left: 0,
+              top: "10%",
+              padding: "20px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              overflow: "hidden",
+              boxShadow: "4px 0px 8px rgba(0, 0, 0, 0.2)",
+            }}
+          >
+            <Item title="Dashboard" to="/" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
+            <Item title="Customer Manager" to="/cm" icon={<PeopleAltOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
+            <Item title="Customer Relationship Manager" to="/crm" icon={<HandshakeOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
+            <Item title="Organizations" to="/hob" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
+            <Item title="Notes" to="/notes" icon={<DescriptionOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
+            <Item title="Calendar" to="/calendar" icon={<CalendarTodayOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
+            <Item title="Logout" to="/logout" icon={<LogoutOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
+          </Box>
+        </Modal>
       </Box>
     </Box>
   );

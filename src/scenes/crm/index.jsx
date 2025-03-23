@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -6,18 +6,11 @@ import {
   InputBase,
   useTheme,
   useMediaQuery,
-  // MenuItem,
-  // Menu,
-  // Typography,
-  // Checkbox,
-  // FormControlLabel,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import {
   Search as SearchIcon,
-  // FilterList as FilterIcon,
-  // ImportExport as ImportExportIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -33,7 +26,6 @@ const initialTickets = [
   { id: 7, name: "Charan Palemala", email: "charan@gmail.com", phone: "1234567890", city: "Visakhapatnam", created: "14th March, 2025" },
   { id: 8, name: "Satya Narayana", email: "Satya@gmail.com", phone: "1234567890", city: "Visakhapatnam", created: "14th March, 2025" },
   { id: 9, name: "John Doe", email: "john@gmail.com", phone: "1234567890", city: "New York", created: "15th March, 2025" },
-  // Add more tickets with unique IDs
 ];
 
 // Columns for DataGrid
@@ -53,13 +45,6 @@ const Crm = () => {
   const Navigate = useNavigate();
   const [tickets, setTickets] = useState(initialTickets);
 
-  // State for tickets
-  // const [tickets] = useState(initialTickets); // Removed setTickets since it's unused
-  // const [filteredTickets, setFilteredTickets] = useState(initialTickets);
-  const [searchTerm, setSearchTerm] = useState("");
-  // const [filterAnchorEl, setFilterAnchorEl] = useState(null);
-  // const [selectedFilters, setSelectedFilters] = useState({ priority: [], status: [] });
-
   // Search filter
   const handleSearchChange = (event) => {
     const searchTerm = event.target.value.toLowerCase();
@@ -71,55 +56,13 @@ const Crm = () => {
     setTickets(filteredTickets);
   };
 
-  // Open & Close Filter Menu
-  // const handleFilterClick = (event) => setFilterAnchorEl(event.currentTarget);
-  // const handleFilterClose = () => setFilterAnchorEl(null);
-
-  // Handle Filter Selection
-  // const handleFilterSelect = (filterType, value) => {
-  //   setSelectedFilters((prev) => {
-  //     const updatedFilters = { ...prev };
-  //     updatedFilters[filterType] = updatedFilters[filterType].includes(value)
-  //       ? updatedFilters[filterType].filter((item) => item !== value)
-  //       : [...updatedFilters[filterType], value];
-  //     applyFilters(searchTerm, updatedFilters);
-  //     return updatedFilters;
-  //   });
-  // };
-
-  // Apply Filters
-  // const applyFilters = (search, filters) => {
-  //   let filtered = tickets;
-  //   if (search.trim()) {
-  //     filtered = filtered.filter((ticket) =>
-  //       Object.values(ticket).some((value) =>
-  //         String(value).toLowerCase().includes(search.toLowerCase())
-  //       )
-  //     );
-  //   }
-  //   if (filters.priority.length) {
-  //     filtered = filtered.filter((ticket) => filters.priority.includes(ticket.priority));
-  //   }
-  //   if (filters.status.length) {
-  //     filtered = filtered.filter((ticket) => filters.status.includes(ticket.status));
-  //   }
-  //   setFilteredTickets(filtered);
-  // };
-  useEffect(() => {
-    // Fetch or update tickets here
-    setTickets(initialTickets);
-  }, [initialTickets]);
-
   const handleNewTicket = () => {
-    Navigate('/crmform')
+    Navigate('/crmform');
   };
 
   const handleRowClick = (params) => {
     Navigate('/crmdetails', { state: { ticket: params.row } });
   };
-
-  // Get Unique Values for Filters
-  // const getUniqueValues = (key) => [...new Set(tickets.map((ticket) => ticket[key]))];
 
   return (
     <Box m="20px">
@@ -127,87 +70,26 @@ const Crm = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={2} flexDirection={isMobile ? "column" : "row"}>
         {/* Search Bar */}
         <Box display="flex" backgroundColor="#ffffff" borderRadius="3px" flex={1}>
-          <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" value={searchTerm} onChange={handleSearchChange} />
+          <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" onChange={handleSearchChange} />
           <IconButton type="button" sx={{ p: 1 }}>
             <SearchIcon />
           </IconButton>
         </Box>
 
-        {/* Export Button */}
-        {/* <Button 
-         sx={{
-          backgroundColor: colors.blueAccent[500],
-          color: "#ffffff",
-          whiteSpace: "nowrap",
-          fontWeight: "bold",
-        }}
-          variant="contained" 
-          startIcon={<ImportExportIcon />} 
-          onClick={() => alert("Export Data!")}
-        >
-          Export
-        </Button> */}
-
-        {/* Filter Button */}
-        {/* <Button           
-                  sx={{
-                    backgroundColor: colors.blueAccent[500],
-                    color: "#ffffff",
-                    whiteSpace: "nowrap",
-                    fontWeight: "bold",
-                      textTransform:"none"
-                  }}
-          variant="contained" 
-          startIcon={<FilterIcon />} 
-          onClick={handleFilterClick}
-        >
-          Filter
-        </Button> */}
         <Button
-            variant="contained"
-            sx={{
-              background: colors.blueAccent[500],
-              fontWeight: "bold",
-              color: "#ffffff",
-              whiteSpace: "nowrap",
-              // paddingX: "15px"
-              // padding: "12px 18px ",
-              // fontSize: "14px",
-              textTransform:"none"
-            }}
-            startIcon={<AddIcon />}
-            onClick={handleNewTicket}
-          >
-             Create New
-          </Button>
-
-        {/* Filter Menu */}
-        {/* <Menu anchorEl={filterAnchorEl} open={Boolean(filterAnchorEl)} onClose={handleFilterClose}>
-          <Box p={2}>
-            <Typography variant="h6">Priority</Typography>
-            {getUniqueValues("priority").map((priority) => (
-              <MenuItem key={priority}>
-                <FormControlLabel
-                  control={<Checkbox checked={selectedFilters.priority.includes(priority)} onChange={() => handleFilterSelect("priority", priority)} />}
-                  label={priority}
-                />
-              </MenuItem>
-            ))}
-          </Box>
-
-          <Box p={2}>
-            <Typography variant="h6">Status</Typography>
-            {getUniqueValues("status").map((status) => (
-              <MenuItem key={status}>
-                <FormControlLabel
-                  sx={{ backgroundColor: "#ffffff" }}
-                  control={<Checkbox checked={selectedFilters.status.includes(status)} onChange={() => handleFilterSelect("status", status)} />}
-                  label={status}
-                />
-              </MenuItem>
-            ))}
-          </Box>
-        </Menu> */}
+          variant="contained"
+          sx={{
+            background: colors.blueAccent[500],
+            fontWeight: "bold",
+            color: "#ffffff",
+            whiteSpace: "nowrap",
+            textTransform: "none"
+          }}
+          startIcon={<AddIcon />}
+          onClick={handleNewTicket}
+        >
+          Create New
+        </Button>
       </Box>
 
       {/* DataGrid */}
@@ -216,48 +98,44 @@ const Crm = () => {
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
-            overflowX: "auto", // Enable horizontal scrolling
+            overflowX: "auto",
           },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
             fontSize: "16px",
-            whiteSpace: "nowrap", // Prevent text wrapping
-            overflow: "visible", // Prevent text truncation
+            whiteSpace: "nowrap",
+            overflow: "visible",
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[700],
-            borderBottom: "none", // Remove the border below the header
+            borderBottom: "none",
             fontWeight: "bold !important",
             fontSize: "16px !important",
             color: "#ffffff",
           },
-          // "& .MuiDataGrid-root::-webkit-scrollbar-thumb":{
-          //    width: "2px !important",
-          //    height: "6px !important"
-          //  },
           "& .MuiDataGrid-columnSeparator": {
-            display: "none", // Hide the column separator
+            display: "none",
           },
           "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: "bold !important", // Ensure header text is bold
+            fontWeight: "bold !important",
           },
           "& .MuiDataGrid-virtualScroller": {
             backgroundColor: "#ffffff",
           },
           "& .MuiDataGrid-row": {
-            borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
+            borderBottom: `0.5px solid ${colors.grey[300]}`,
           },
           "& .MuiTablePagination-root": {
-            color: "#ffffff !important", // Ensure pagination text is white
+            color: "#ffffff !important",
           },
           "& .MuiTablePagination-selectLabel, & .MuiTablePagination-input": {
-            color: "#ffffff !important", // Ensure select label and input text are white
+            color: "#ffffff !important",
           },
           "& .MuiTablePagination-displayedRows": {
-            color: "#ffffff !important", // Ensure displayed rows text is white
+            color: "#ffffff !important",
           },
           "& .MuiSvgIcon-root": {
-            color: "#ffffff !important", // Ensure pagination icons are white
+            color: "#ffffff !important",
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
@@ -266,71 +144,6 @@ const Crm = () => {
           },
         }}>
         <DataGrid
-             sx={{
-              "& .MuiDataGrid-cell": {
-                borderBottom: "none",
-                fontSize: "16px",
-                whiteSpace: "nowrap", // Prevent text wrapping
-                overflow: "visible", // Prevent text truncation
-              },
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: colors.blueAccent[700],
-                borderBottom: "none", // Remove the border below the header
-                fontWeight: "bold !important",
-                fontSize: "16px !important",
-                color: "#ffffff",
-              },
-              // "& .MuiDataGrid-root::-webkit-scrollbar-thumb":{
-              //    width: "2px !important",
-              //    height: "6px !important"
-              //  },
-              "& .MuiDataGrid-columnSeparator": {
-                display: "none", // Hide the column separator
-              },
-              // "& .MuiDataGrid-root::-webkit-scrollbar": {
-              //   display: "none", // Hides scrollbar in Chrome, Safari
-              // },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                fontWeight: "bold !important", // Ensure header text is bold
-              },
-              // "& .MuiDataGrid-virtualScroller": {
-              //   backgroundColor: "#ffffff",
-              // },
-              "& .MuiDataGrid-root::-webkit-scrollbar": {
-                display: "none !important",
-              },
-              "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
-                display: "none !important",
-              },
-              "& .MuiDataGrid-root": {
-                // scrollbarWidth: "none !important", // Hides scrollbar in Firefox
-              },
-              "& .MuiDataGrid-virtualScroller": {
-                // scrollbarWidth: "none !important",
-                backgroundColor: "#ffffff",
-              },
-              "& .MuiDataGrid-row": {
-                borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
-              },
-              "& .MuiTablePagination-root": {
-                color: "#ffffff !important", // Ensure pagination text is white
-              },
-              "& .MuiTablePagination-selectLabel, & .MuiTablePagination-input": {
-                color: "#ffffff !important", // Ensure select label and input text are white
-              },
-              "& .MuiTablePagination-displayedRows": {
-                color: "#ffffff !important", // Ensure displayed rows text is white
-              },
-              "& .MuiSvgIcon-root": {
-                color: "#ffffff !important", // Ensure pagination icons are white
-              },
-              "& .MuiDataGrid-footerContainer": {
-                borderTop: "none",
-                backgroundColor: colors.blueAccent[700],
-                color: "#ffffff",
-              },
-            }}
-          // rows={initialTickets}
           columns={columns}
           rows={tickets}
           pageSize={10}
@@ -340,4 +153,5 @@ const Crm = () => {
     </Box>
   );
 };
+
 export default Crm;

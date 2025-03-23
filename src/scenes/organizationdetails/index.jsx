@@ -13,6 +13,7 @@ const OrganizationDetails = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const location = useLocation();
   const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
 
@@ -36,6 +37,11 @@ const OrganizationDetails = () => {
     // Combine phone code and phone number
     const fullPhoneNumber = `${values.phoneCode}${values.PhoneNo}`;
     console.log("Form Data:", { ...values, fullPhoneNumber });
+    setIsEditing(false); // Exit editing mode after saving
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false); // Exit editing mode without saving
   };
 
   const initialValues = {
@@ -77,6 +83,7 @@ const OrganizationDetails = () => {
       borderRadius: "8px",
       backgroundColor: "#ffffff",
       boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+      fontSize: "16px", 
       "&:hover": {
         borderColor: "#999",
         boxShadow: "4px 4px 8px rgba(0, 0, 0, 0.15)",
@@ -86,6 +93,7 @@ const OrganizationDetails = () => {
     },
     "& .MuiInputLabel-root": {
       color: "#555",
+      fontSize: "16px", 
     },
     "& .MuiOutlinedInput-notchedOutline": {
       border: "1px solid #ccc", // Ensure the border is visible
@@ -109,67 +117,109 @@ const OrganizationDetails = () => {
             <Box
               display="grid"
               gap="20px"
-              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))"}
+              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
             >
-              {/* First Name, Middle Name, Last Name */}
-              {[
-                { label: "Organization Name", name: "organization" },
-                { label: "Founder Name", name: "name" },
-                // { label: "Last Name", name: "lastName" },
-                { label: "Email Id", name: "email", type: "email" },
-                { label: "Address", name: "address", type: "address" },
-              ].map((field, index) => (
-                <TextField
-                  key={index}
-                  fullWidth
-                  variant="outlined"
-                  type={field.type || "text"}
-                  label={field.label}
-                  name={field.name}
-                  value={values[field.name]}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched[field.name] && !!errors[field.name]}
-                  helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 2" }}
-                />
-              ))}
-
-              {/* Phone Code Dropdown */}
-              <Autocomplete
-                fullWidth
-                options={countries}
-                getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
-                value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
-                onChange={(event, newValue) => {
-                  setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Phone Code"
-                    sx={textFieldStyles}
-                    error={!!touched.phoneCode && !!errors.phoneCode}
-                    helperText={touched.phoneCode && errors.phoneCode}
-                  />
-                )}
-                sx={{ gridColumn: "span 1" }}
-              />
-
-              {/* Phone Number Input */}
+              {/* Organization Name */}
               <TextField
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Phone No"
-                name="PhoneNo"
-                value={values.PhoneNo}
+                label="Organization Name"
+                name="organization"
+                value={values.organization}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                error={!!touched.PhoneNo && !!errors.PhoneNo}
-                helperText={touched.PhoneNo && errors.PhoneNo}
+                error={!!touched.organization && !!errors.organization}
+                helperText={touched.organization && errors.organization}
                 sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
+
+              {/* Founder Name */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Founder Name"
+                name="name"
+                value={values.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.name && !!errors.name}
+                helperText={touched.name && errors.name}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
+              />
+
+              {/* Email Id */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="email"
+                label="Email Id"
+                name="email"
+                value={values.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.email && !!errors.email}
+                helperText={touched.email && errors.email}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
+              />
+
+              {/* Address */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Address"
+                name="address"
+                value={values.address}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.address && !!errors.address}
+                helperText={touched.address && errors.address}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
+              />
+
+              {/* Phone Code and Phone Number (Combined as one span) */}
+              <Box sx={{ gridColumn: "span 1", display: "flex", gap: "10px" }}>
+                <Autocomplete
+                  fullWidth
+                  options={countries}
+                  getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
+                  value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
+                  onChange={(event, newValue) => {
+                    setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Phone Code"
+                      sx={textFieldStyles}
+                      error={!!touched.phoneCode && !!errors.phoneCode}
+                      helperText={touched.phoneCode && errors.phoneCode}
+                      disabled={!isEditing} // Disable in non-editing mode
+                    />
+                  )}
+                  disabled={!isEditing} // Disable in non-editing mode
+                />
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  type="text"
+                  label="Phone No"
+                  name="PhoneNo"
+                  value={values.PhoneNo}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.PhoneNo && !!errors.PhoneNo}
+                  helperText={touched.PhoneNo && errors.PhoneNo}
+                  sx={textFieldStyles}
+                  disabled={!isEditing} // Disable in non-editing mode
+                />
+              </Box>
 
               {/* Country Dropdown */}
               <Autocomplete
@@ -190,9 +240,11 @@ const OrganizationDetails = () => {
                     sx={textFieldStyles}
                     error={!!touched.country && !!errors.country}
                     helperText={touched.country && errors.country}
+                    disabled={!isEditing} // Disable in non-editing mode
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
 
               {/* State Dropdown */}
@@ -213,11 +265,11 @@ const OrganizationDetails = () => {
                     sx={textFieldStyles}
                     error={!!touched.state && !!errors.state}
                     helperText={touched.state && errors.state}
-                    disabled={!selectedCountry}
+                    disabled={!selectedCountry || !isEditing} // Disable in non-editing mode
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
-                disabled={!selectedCountry}
+                sx={{ gridColumn: "span 1" }}
+                disabled={!selectedCountry || !isEditing} // Disable in non-editing mode
               />
 
               {/* City Dropdown */}
@@ -237,34 +289,77 @@ const OrganizationDetails = () => {
                     sx={textFieldStyles}
                     error={!!touched.city && !!errors.city}
                     helperText={touched.city && errors.city}
-                    disabled={!selectedState}
+                    disabled={!selectedState || !isEditing} // Disable in non-editing mode
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
-                disabled={!selectedState}
+                sx={{ gridColumn: "span 1" }}
+                disabled={!selectedState || !isEditing} // Disable in non-editing mode
               />
-
             </Box>
 
             <Box display="flex" justifyContent="flex-end" mt="24px">
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  padding: "12px 24px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  borderRadius: "8px",
-                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                  transition: "0.3s",
-                  backgroundColor: colors.blueAccent[700],
-                  color: "#ffffff",
-                  textTransform: "none",
-                  "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
-                }}
-              >
-                Update
-              </Button>
+              {!isEditing ? (
+                <Button
+                  type="button"
+                  variant="contained"
+                  onClick={() => setIsEditing(true)} // Enable editing mode
+                  sx={{
+                    padding: "12px 24px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    borderRadius: "8px",
+                    boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                    transition: "0.3s",
+                    backgroundColor: colors.blueAccent[700],
+                    color: "#ffffff",
+                    textTransform: "none",
+                    "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                  }}
+                >
+                  Edit
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                      transition: "0.3s",
+                      backgroundColor: colors.blueAccent[700],
+                      color: "#ffffff",
+                      textTransform: "none",
+                      "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="contained"
+                    onClick={handleCancel} // Cancel editing mode
+                    sx={{
+                      padding: "12px 24px",
+                      marginLeft:"5px",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                      transition: "0.3s",
+                      backgroundColor: colors.redAccent[600],
+                      color: "#ffffff",
+                      textTransform: "none",
+                      "&:hover": { backgroundColor: colors.redAccent[700], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
             </Box>
           </form>
         )}

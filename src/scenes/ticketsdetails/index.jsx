@@ -2,42 +2,35 @@ import { Box, Button, TextField, useMediaQuery, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
-import React, { useMemo } from 'react';
-// import { Country, State, City } from 'country-state-city';
+import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const TicketDetails = () => {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(max-width:600px)");
   const colors = tokens(theme.palette.mode); // Get theme colors
-  // const [selectedCountry, setSelectedCountry] = useState(null);
-  // const [selectedState, setSelectedState] = useState(null);
-  // const [selectedCity, setSelectedCity] = useState(null);
+  const [isEditing, setIsEditing] = useState(false); // State to manage editing mode
   const location = useLocation();
 
   // Memoize the ticket object to avoid unnecessary re-renders
   const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
 
-  // Initialize selectedCountry, selectedState, and selectedCity based on ticket data
-  // useEffect(() => {
-  //   if (ticket.country) {
-  //     const country = Country.getAllCountries().find((c) => c.name === ticket.country);
-  //     setSelectedCountry(country || null);
-  //   }
-  //   if (ticket.state && selectedCountry) {
-  //     const state = State.getStatesOfCountry(selectedCountry.isoCode).find((s) => s.name === ticket.state);
-  //     setSelectedState(state || null);
-  //   }
-  //   if (ticket.city && selectedState) {
-  //     const city = City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode).find((c) => c.name === ticket.city);
-  //     setSelectedCity(city || null);
-  //   }
-  // }, [ticket, selectedCountry, selectedState]);
+  // Define countries with phone codes
+
 
   const handleFormSubmit = (values) => {
     // Combine phone code and phone number
     const fullPhoneNumber = `${values.phoneCode}${values.PhoneNo}`;
     console.log("Form Data:", { ...values, fullPhoneNumber });
+    setIsEditing(false); // Disable inputs after saving
+  };
+
+  // const handleEdit = () => {
+  //   setIsEditing(true); // Enable inputs when Edit button is clicked
+  // };
+
+  const handleCancel = () => {
+    setIsEditing(false); // Exit editing mode without saving
   };
 
   // Define initialValues based on ticket data
@@ -50,6 +43,8 @@ const TicketDetails = () => {
     date: ticket.date || "",
     time: ticket.time || "",
     subject: ticket.subject || "",
+    phoneCode: ticket.phoneCode || "",
+    PhoneNo: ticket.PhoneNo || "",
   };
 
   const checkoutSchema = yup.object().shape({
@@ -61,6 +56,12 @@ const TicketDetails = () => {
     date: yup.string().required("Required"),
     time: yup.string().required("Required"),
     subject: yup.string().required("Required"),
+    phoneCode: yup.string().required("Required"),
+    PhoneNo: yup
+      .string()
+      .matches(/^[0-9]+$/, "Only numbers are allowed")
+      .min(10, "Must be at least 10 digits")
+      .required("Required"),
   });
 
   const textFieldStyles = {
@@ -68,6 +69,7 @@ const TicketDetails = () => {
       borderRadius: "8px",
       backgroundColor: "#ffffff",
       boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+      fontSize: "16px",
       "&:hover": {
         borderColor: "#999",
         boxShadow: "4px 4px 8px rgba(0, 0, 0, 0.15)",
@@ -76,6 +78,7 @@ const TicketDetails = () => {
       height: "50px",
     },
     "& .MuiInputLabel-root": {
+      fontSize: "16px",
       color: "#555",
     },
     "& .MuiOutlinedInput-notchedOutline": {
@@ -86,12 +89,12 @@ const TicketDetails = () => {
   return (
     <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
       <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
-        {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
+        {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
           <form onSubmit={handleSubmit}>
             <Box
               display="grid"
               gap="20px"
-              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))"}
+              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
             >
               {/* Customer Manager Name */}
               <TextField
@@ -105,7 +108,8 @@ const TicketDetails = () => {
                 onBlur={handleBlur}
                 error={!!touched.cmname && !!errors.cmname}
                 helperText={touched.cmname && errors.cmname}
-                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
 
               {/* Priority */}
@@ -120,7 +124,8 @@ const TicketDetails = () => {
                 onBlur={handleBlur}
                 error={!!touched.priority && !!errors.priority}
                 helperText={touched.priority && errors.priority}
-                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
 
               {/* Customer Relationship Manager Name */}
@@ -135,7 +140,8 @@ const TicketDetails = () => {
                 onBlur={handleBlur}
                 error={!!touched.crmname && !!errors.crmname}
                 helperText={touched.crmname && errors.crmname}
-                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
 
               {/* Status */}
@@ -150,7 +156,8 @@ const TicketDetails = () => {
                 onBlur={handleBlur}
                 error={!!touched.status && !!errors.status}
                 helperText={touched.status && errors.status}
-                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
 
               {/* Department */}
@@ -165,8 +172,10 @@ const TicketDetails = () => {
                 onBlur={handleBlur}
                 error={!!touched.department && !!errors.department}
                 helperText={touched.department && errors.department}
-                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
+
 
               {/* Date */}
               <TextField
@@ -180,7 +189,8 @@ const TicketDetails = () => {
                 onBlur={handleBlur}
                 error={!!touched.date && !!errors.date}
                 helperText={touched.date && errors.date}
-                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
 
               {/* Time */}
@@ -195,7 +205,8 @@ const TicketDetails = () => {
                 onBlur={handleBlur}
                 error={!!touched.time && !!errors.time}
                 helperText={touched.time && errors.time}
-                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
 
               {/* Subject */}
@@ -210,29 +221,74 @@ const TicketDetails = () => {
                 onBlur={handleBlur}
                 error={!!touched.subject && !!errors.subject}
                 helperText={touched.subject && errors.subject}
-                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
               />
             </Box>
 
             <Box display="flex" justifyContent="flex-end" mt="24px">
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  padding: "12px 24px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  borderRadius: "8px",
-                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                  transition: "0.3s",
-                  backgroundColor: colors.blueAccent[700],
-                  color: "#ffffff",
-                  textTransform: "none",
-                  "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
-                }}
-              >
-                Update
-              </Button>
+              {!isEditing ? (
+                <Button
+                  type="button"
+                  variant="contained"
+                  onClick={() => setIsEditing(true)} // Enable editing mode
+                  sx={{
+                    padding: "12px 24px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    borderRadius: "8px",
+                    boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                    transition: "0.3s",
+                    backgroundColor: colors.blueAccent[700],
+                    color: "#ffffff",
+                    textTransform: "none",
+                    "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                  }}
+                >
+                  Edit
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                      transition: "0.3s",
+                      backgroundColor: colors.blueAccent[700],
+                      color: "#ffffff",
+                      textTransform: "none",
+                      "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="contained"
+                    onClick={handleCancel} // Cancel editing mode
+                    sx={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                      marginLeft:"5px",
+                      transition: "0.3s",
+                      backgroundColor: colors.redAccent[600],
+                      color: "#ffffff",
+                      textTransform: "none",
+                      "&:hover": { backgroundColor: colors.redAccent[700], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
             </Box>
           </form>
         )}

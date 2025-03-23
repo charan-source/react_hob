@@ -13,6 +13,7 @@ const CrmDetails = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [isEditing, setIsEditing] = useState(false); // State to track editing mode
   const location = useLocation();
 
   // Memoize the ticket object to avoid unnecessary re-renders
@@ -38,6 +39,11 @@ const CrmDetails = () => {
     // Combine phone code and phone number
     const fullPhoneNumber = `${values.phoneCode}${values.PhoneNo}`;
     console.log("Form Data:", { ...values, fullPhoneNumber });
+    setIsEditing(false); // Exit editing mode after saving
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false); // Exit editing mode without saving
   };
 
   const initialValues = {
@@ -58,7 +64,7 @@ const CrmDetails = () => {
   const checkoutSchema = yup.object().shape({
     firstName: yup.string().required("Required"),
     middleName: yup.string(),
-    lastName: yup.string().required("Required"),
+    lastName: yup.string().required(""),
     street: yup.string().required("Required"),
     city: yup.string().required("Required"),
     state: yup.string().required("Required"),
@@ -79,15 +85,17 @@ const CrmDetails = () => {
       borderRadius: "8px",
       backgroundColor: "#ffffff",
       boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+      fontSize: "16px",
       "&:hover": {
         borderColor: "#999",
         boxShadow: "4px 4px 8px rgba(0, 0, 0, 0.15)",
       },
-      padding: "8px 12px",
+      padding: "8px 8px",
       height: "50px",
     },
     "& .MuiInputLabel-root": {
       color: "#555",
+      fontSize: "16px", // Increased font size for input labels
     },
     "& .MuiOutlinedInput-notchedOutline": {
       border: "1px solid #ccc", // Ensure the border is visible
@@ -129,20 +137,19 @@ const CrmDetails = () => {
             <Box
               display="grid"
               gap="20px"
-              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))"}
+              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
             >
               {/* First Name, Middle Name, Last Name */}
               {[
                 { label: "First Name", name: "firstName" },
                 { label: "Middle Name", name: "middleName" },
                 { label: "Last Name", name: "lastName" },
-                { label: "Email Id", name: "email", type: "email" },
               ].map((field, index) => (
                 <TextField
                   key={index}
                   fullWidth
                   variant="outlined"
-                  type={field.type || "text"}
+                  type="text"
                   label={field.label}
                   name={field.name}
                   value={values[field.name]}
@@ -150,45 +157,67 @@ const CrmDetails = () => {
                   onBlur={handleBlur}
                   error={!!touched[field.name] && !!errors[field.name]}
                   helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                  disabled={!isEditing} // Disable if not in editing mode
                 />
               ))}
 
-              {/* Phone Code Dropdown */}
-              <Autocomplete
-                fullWidth
-                options={countries}
-                getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
-                value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
-                onChange={(event, newValue) => {
-                  setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Phone Code"
-                    sx={textFieldStyles}
-                    error={!!touched.phoneCode && !!errors.phoneCode}
-                    helperText={touched.phoneCode && errors.phoneCode}
-                  />
-                )}
-                sx={{ gridColumn: "span 1" }}
-              />
-
-              {/* Phone Number Input */}
+              {/* Email */}
               <TextField
                 fullWidth
                 variant="outlined"
-                type="text"
-                label="Phone No"
-                name="PhoneNo"
-                value={values.PhoneNo}
+                type="email"
+                label="Email Id"
+                name="email"
+                value={values.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                error={!!touched.PhoneNo && !!errors.PhoneNo}
-                helperText={touched.PhoneNo && errors.PhoneNo}
+                error={!!touched.email && !!errors.email}
+                helperText={touched.email && errors.email}
                 sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable if not in editing mode
               />
+
+              {/* Phone Code and Phone Number in a single span */}
+              <Box sx={{ gridColumn: "span 1", display: "flex", gap: "10px" }}>
+                {/* Phone Code Dropdown */}
+                <Autocomplete
+                  fullWidth
+                  options={countries}
+                  getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
+                  value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
+                  onChange={(event, newValue) => {
+                    setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Phone Code"
+                      sx={textFieldStyles}
+                      error={!!touched.phoneCode && !!errors.phoneCode}
+                      helperText={touched.phoneCode && errors.phoneCode}
+                      disabled={!isEditing} // Disable if not in editing mode
+                    />
+                  )}
+                  disabled={!isEditing} // Disable if not in editing mode
+                />
+
+                {/* Phone Number Input */}
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  type="text"
+                  label="Phone No"
+                  name="PhoneNo"
+                  value={values.PhoneNo}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.PhoneNo && !!errors.PhoneNo}
+                  helperText={touched.PhoneNo && errors.PhoneNo}
+                  sx={textFieldStyles}
+                  disabled={!isEditing} // Disable if not in editing mode
+                />
+              </Box>
 
               {/* Country Dropdown */}
               <Autocomplete
@@ -209,9 +238,11 @@ const CrmDetails = () => {
                     sx={textFieldStyles}
                     error={!!touched.country && !!errors.country}
                     helperText={touched.country && errors.country}
+                    disabled={!isEditing} // Disable if not in editing mode
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable if not in editing mode
               />
 
               {/* State Dropdown */}
@@ -232,11 +263,11 @@ const CrmDetails = () => {
                     sx={textFieldStyles}
                     error={!!touched.state && !!errors.state}
                     helperText={touched.state && errors.state}
-                    disabled={!selectedCountry}
+                    disabled={!selectedCountry || !isEditing} // Disable if not in editing mode
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
-                disabled={!selectedCountry}
+                sx={{ gridColumn: "span 1" }}
+                disabled={!selectedCountry || !isEditing} // Disable if not in editing mode
               />
 
               {/* City Dropdown */}
@@ -256,28 +287,29 @@ const CrmDetails = () => {
                     sx={textFieldStyles}
                     error={!!touched.city && !!errors.city}
                     helperText={touched.city && errors.city}
-                    disabled={!selectedState}
+                    disabled={!selectedState || !isEditing} // Disable if not in editing mode
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
-                disabled={!selectedState}
+                sx={{ gridColumn: "span 1" }}
+                disabled={!selectedState || !isEditing} // Disable if not in editing mode
               />
 
               {/* Organization Dropdown */}
-              <FormControl fullWidth sx={{ gridColumn: "span 2", ...textFieldStyles }}>
-                <InputLabel>Organization</InputLabel>
+              <FormControl fullWidth sx={{ gridColumn: "span 1", ...textFieldStyles }}>
+                <InputLabel sx={{ fontSize: "16px" }}>Organization</InputLabel> {/* Increased font size */}
                 <Select
                   name="organization"
                   value={values.organization}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   label="Organization"
+                  disabled={!isEditing} // Disable if not in editing mode
                 >
                   <MenuItem value="" disabled>
                     Select Organization
                   </MenuItem>
                   {organization.map((org, index) => (
-                    <MenuItem key={index} value={org}>
+                    <MenuItem key={index} value={org} sx={{ fontSize: "16px" }}> {/* Increased font size */}
                       {org}
                     </MenuItem>
                   ))}
@@ -288,20 +320,21 @@ const CrmDetails = () => {
               </FormControl>
 
               {/* Customer Manager Dropdown */}
-              <FormControl fullWidth sx={{ gridColumn: "span 2", ...textFieldStyles }}>
-                <InputLabel>Customer Manager</InputLabel>
+              <FormControl fullWidth sx={{ gridColumn: "span 1", ...textFieldStyles }}>
+                <InputLabel sx={{ fontSize: "16px" }}>Customer Manager</InputLabel> {/* Increased font size */}
                 <Select
                   name="customerManager"
                   value={values.customerManager}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   label="Customer Manager"
+                  disabled={!isEditing} // Disable if not in editing mode
                 >
                   <MenuItem value="" disabled>
                     Select Customer Manager
                   </MenuItem>
                   {customerManagers.map((manager, index) => (
-                    <MenuItem key={index} value={manager}>
+                    <MenuItem key={index} value={manager} sx={{ fontSize: "16px" }}> {/* Increased font size */}
                       {manager}
                     </MenuItem>
                   ))}
@@ -312,25 +345,68 @@ const CrmDetails = () => {
               </FormControl>
             </Box>
 
-            <Box display="flex" justifyContent="flex-end" mt="24px">
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  padding: "12px 24px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  borderRadius: "8px",
-                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                  transition: "0.3s",
-                  backgroundColor: colors.blueAccent[700],
-                  color: "#ffffff",
-                  textTransform: "none",
-                  "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
-                }}
-              >
-                Update
-              </Button>
+            <Box display="flex" justifyContent="flex-end" mt="24px" gap="10px">
+              {!isEditing ? (
+                <Button
+                  type="button"
+                  variant="contained"
+                  onClick={() => setIsEditing(true)} // Enable editing mode
+                  sx={{
+                    padding: "12px 24px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    borderRadius: "8px",
+                    boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                    transition: "0.3s",
+                    backgroundColor: colors.blueAccent[700],
+                    color: "#ffffff",
+                    textTransform: "none",
+                    "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                  }}
+                >
+                  Edit
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                      transition: "0.3s",
+                      backgroundColor: colors.blueAccent[700],
+                      color: "#ffffff",
+                      textTransform: "none",
+                      "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="contained"
+                    onClick={handleCancel} // Cancel editing mode
+                    sx={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                      transition: "0.3s",
+                      backgroundColor: colors.redAccent[600],
+                      color: "#ffffff",
+                      textTransform: "none",
+                      "&:hover": { backgroundColor: colors.redAccent[700], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
             </Box>
           </form>
         )}

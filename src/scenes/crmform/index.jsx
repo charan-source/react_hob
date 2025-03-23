@@ -18,13 +18,17 @@ const customRender = ({ options, customProps, ...selectProps }) => (
   <Select
     {...selectProps}
     {...customProps}
-    //  // Remove the dropdown arrow icon
+    IconComponent={null} // Remove the dropdown arrow icon
     sx={{
       "& .MuiOutlinedInput-root": {
         borderRadius: "8px",
-        border: "1px solid #ccc", // Default border
+        border: "none", // Remove border
+        backgroundColor: "#ffffff",
+        boxShadow: "none", // Remove box shadow
       },
-      border: "none",
+      "& .MuiOutlinedInput-notchedOutline": {
+        border: "none", // Remove the default outline
+      },
     }}
   >
     {options.map(({ label, value, key }) => (
@@ -78,7 +82,7 @@ const CrmForm = () => {
       .min(10, "Must be at least 10 digits")
       .required("Required"),
     phoneCode: yup.string().required("Required"),
-  })
+  });
 
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
@@ -144,7 +148,7 @@ const CrmForm = () => {
                   onChange={(e) => setCountryid(e.id)}
                   placeHolder="Select Country"
                   customRender={customRender}
-                  style={{ height: "37px", border: "none" }}
+                  style={{ height: "37px", border: "none", boxShadow: "none" }}
                 />
               </FormControl>
 
@@ -157,7 +161,7 @@ const CrmForm = () => {
                   onChange={(e) => setStateid(e.id)}
                   placeHolder="Select State"
                   customRender={customRender}
-                  style={{ height: "37px", border: "none" }}
+                  style={{ height: "37px", border: "none", boxShadow: "none" }}
                 />
               </FormControl>
 
@@ -171,7 +175,7 @@ const CrmForm = () => {
                   onChange={(e) => console.log(e)}
                   placeHolder="Select City"
                   customRender={customRender}
-                  style={{ height: "37px", border: "none" }}
+                  style={{ height: "37px", border: "none", boxShadow: "none" }}
                 />
               </FormControl>
 
@@ -179,14 +183,12 @@ const CrmForm = () => {
               <FormControl fullWidth sx={{ gridColumn: "span 2" }}>
                 <PhonecodeSelect
                   countryid={countryid}
-                  value={phoneCode}
                   containerClassName="form-group"
                   inputClassName="form-control"
                   onChange={(e) => setPhoneCode(e)}
-                  
                   placeHolder="Select Phone Code"
                   customRender={customRender}
-                  style={{ height: "37px", border: "none" }}
+                  style={{ height: "37px", border: "none", boxShadow: "none" }}
                 />
               </FormControl>
             </Box>

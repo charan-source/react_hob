@@ -1,0 +1,244 @@
+import { Box, Button, TextField, useMediaQuery, useTheme } from "@mui/material";
+import { tokens } from "../../theme";
+import { Formik } from "formik";
+import * as yup from "yup";
+import React, { useMemo } from 'react';
+// import { Country, State, City } from 'country-state-city';
+import { useLocation } from 'react-router-dom';
+
+const TicketDetails = () => {
+  const theme = useTheme();
+  const isNonMobile = useMediaQuery("(max-width:600px)");
+  const colors = tokens(theme.palette.mode); // Get theme colors
+  // const [selectedCountry, setSelectedCountry] = useState(null);
+  // const [selectedState, setSelectedState] = useState(null);
+  // const [selectedCity, setSelectedCity] = useState(null);
+  const location = useLocation();
+
+  // Memoize the ticket object to avoid unnecessary re-renders
+  const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
+
+  // Initialize selectedCountry, selectedState, and selectedCity based on ticket data
+  // useEffect(() => {
+  //   if (ticket.country) {
+  //     const country = Country.getAllCountries().find((c) => c.name === ticket.country);
+  //     setSelectedCountry(country || null);
+  //   }
+  //   if (ticket.state && selectedCountry) {
+  //     const state = State.getStatesOfCountry(selectedCountry.isoCode).find((s) => s.name === ticket.state);
+  //     setSelectedState(state || null);
+  //   }
+  //   if (ticket.city && selectedState) {
+  //     const city = City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode).find((c) => c.name === ticket.city);
+  //     setSelectedCity(city || null);
+  //   }
+  // }, [ticket, selectedCountry, selectedState]);
+
+  const handleFormSubmit = (values) => {
+    // Combine phone code and phone number
+    const fullPhoneNumber = `${values.phoneCode}${values.PhoneNo}`;
+    console.log("Form Data:", { ...values, fullPhoneNumber });
+  };
+
+  // Define initialValues based on ticket data
+  const initialValues = {
+    cmname: ticket.cmname?.split(' ')[0] || "",
+    priority: ticket.priority || "",
+    crmname: ticket.crmname || "",
+    status: ticket.status || "",
+    department: ticket.department || "",
+    date: ticket.date || "",
+    time: ticket.time || "",
+    subject: ticket.subject || "",
+  };
+
+  const checkoutSchema = yup.object().shape({
+    cmname: yup.string().required("Required"),
+    priority: yup.string().required("Required"),
+    crmname: yup.string().required("Required"),
+    status: yup.string().required("Required"),
+    department: yup.string().required("Required"),
+    date: yup.string().required("Required"),
+    time: yup.string().required("Required"),
+    subject: yup.string().required("Required"),
+  });
+
+  const textFieldStyles = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "8px",
+      backgroundColor: "#ffffff",
+      boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+      "&:hover": {
+        borderColor: "#999",
+        boxShadow: "4px 4px 8px rgba(0, 0, 0, 0.15)",
+      },
+      padding: "8px 12px",
+      height: "50px",
+    },
+    "& .MuiInputLabel-root": {
+      color: "#555",
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      border: "1px solid #ccc", // Ensure the border is visible
+    },
+  };
+
+  return (
+    <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
+      <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
+        {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
+          <form onSubmit={handleSubmit}>
+            <Box
+              display="grid"
+              gap="20px"
+              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))"}
+            >
+              {/* Customer Manager Name */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Customer Manager Name"
+                name="cmname"
+                value={values.cmname}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.cmname && !!errors.cmname}
+                helperText={touched.cmname && errors.cmname}
+                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+              />
+
+              {/* Priority */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Priority"
+                name="priority"
+                value={values.priority}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.priority && !!errors.priority}
+                helperText={touched.priority && errors.priority}
+                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+              />
+
+              {/* Customer Relationship Manager Name */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Customer Relationship Manager Name"
+                name="crmname"
+                value={values.crmname}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.crmname && !!errors.crmname}
+                helperText={touched.crmname && errors.crmname}
+                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+              />
+
+              {/* Status */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Status"
+                name="status"
+                value={values.status}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.status && !!errors.status}
+                helperText={touched.status && errors.status}
+                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+              />
+
+              {/* Department */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Department"
+                name="department"
+                value={values.department}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.department && !!errors.department}
+                helperText={touched.department && errors.department}
+                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+              />
+
+              {/* Date */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Date"
+                name="date"
+                value={values.date}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.date && !!errors.date}
+                helperText={touched.date && errors.date}
+                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+              />
+
+              {/* Time */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Time"
+                name="time"
+                value={values.time}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.time && !!errors.time}
+                helperText={touched.time && errors.time}
+                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+              />
+
+              {/* Subject */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Subject"
+                name="subject"
+                value={values.subject}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.subject && !!errors.subject}
+                helperText={touched.subject && errors.subject}
+                sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+              />
+            </Box>
+
+            <Box display="flex" justifyContent="flex-end" mt="24px">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  padding: "12px 24px",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                  transition: "0.3s",
+                  backgroundColor: colors.blueAccent[700],
+                  color: "#ffffff",
+                  textTransform: "none",
+                  "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                }}
+              >
+                Update
+              </Button>
+            </Box>
+          </form>
+        )}
+      </Formik>
+    </Box>
+  );
+};
+
+export default TicketDetails;

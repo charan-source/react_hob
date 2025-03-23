@@ -17,8 +17,8 @@ const getActivePage = (pathname) => {
     return "/crm";
   } else if (pathname.includes("/cm") || pathname.includes("/cmform")) {
     return "/cm";
-  } else if (pathname.includes("/hob") || pathname.includes("/form")) {
-    return "/hob";
+  } else if (pathname.includes("/organization") || pathname.includes("/form") || pathname.includes("/organizationdetails") ) {
+    return "/organization";
   } else if (pathname.includes("/notes")) {
     return "/notes";
   } else if (pathname.includes("/calendar")) {
@@ -26,6 +26,7 @@ const getActivePage = (pathname) => {
   } else if (
     pathname === "/" ||
     pathname.includes("/allExperiences") ||
+    pathname.includes("/ticketdetails") ||
     pathname.includes("/newExperiences") ||
     pathname.includes("/pendingExperiences") ||
     pathname.includes("/profile") ||
@@ -131,7 +132,7 @@ const Sidebar = ({ isSidebar }) => {
           selected={selected}
           setSelected={setSelected}
         />
-        <Item title="Organization" to="/hob" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} />
+        <Item title="Organization" to="/organization" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Notes" to="/notes" icon={<DescriptionOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Calendar" to="/calendar" icon={<CalendarTodayOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Logout" to="/logout" icon={<LogoutOutlinedIcon />} selected={selected} setSelected={setSelected} />

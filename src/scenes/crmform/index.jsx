@@ -1,54 +1,22 @@
-import { Box, Button, TextField, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, TextField, useMediaQuery, useTheme, Autocomplete, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
-import Select from '@mui/material/Select';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
 import React, { useState } from 'react';
-import {
-  CountrySelect,
-  StateSelect,
-  CitySelect,
-  PhonecodeSelect,
-} from "react-country-state-city";
-import "react-country-state-city/dist/react-country-state-city.css";
-
-const customRender = ({ options, customProps, ...selectProps }) => (
-  <Select
-    {...selectProps}
-    {...customProps}
-    IconComponent={null} // Remove the dropdown arrow icon
-    sx={{
-      "& .MuiOutlinedInput-root": {
-        borderRadius: "8px",
-        border: "none", // Remove border
-        backgroundColor: "#ffffff",
-        boxShadow: "none", // Remove box shadow
-      },
-      "& .MuiOutlinedInput-notchedOutline": {
-        border: "none", // Remove the default outline
-      },
-    }}
-  >
-    {options.map(({ label, value, key }) => (
-      <MenuItem value={value} key={key}>
-        {label}
-      </MenuItem>
-    ))}
-  </Select>
-);
+import { Country, State, City } from 'country-state-city';
 
 const CrmForm = () => {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(max-width:600px)");
   const colors = tokens(theme.palette.mode); // Get theme colors
-  const [countryid, setCountryid] = useState(0);
-  const [stateid, setStateid] = useState(0);
-  const [phoneCode, setPhoneCode] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedState, setSelectedState] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
 
   const handleFormSubmit = (values) => {
-    console.log("Form Data:", values);
+    // Combine phone code and phone number
+    const fullPhoneNumber = `${values.phoneCode}${values.PhoneNo}`;
+    console.log("Form Data:", { ...values, fullPhoneNumber });
   };
 
   const initialValues = {
@@ -63,7 +31,7 @@ const CrmForm = () => {
     email: "",
     PhoneNo: "",
     phoneCode: "",
-    dropdownSelection: "",
+    customerManager: "", // New field for customer manager
   };
 
   const checkoutSchema = yup.object().shape({
@@ -82,12 +50,12 @@ const CrmForm = () => {
       .min(10, "Must be at least 10 digits")
       .required("Required"),
     phoneCode: yup.string().required("Required"),
+    customerManager: yup.string().required("Required"), // Validation for customer manager
   });
 
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "8px",
-      border: "1px solid #ccc",
       backgroundColor: "#ffffff",
       boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
       "&:hover": {
@@ -101,14 +69,32 @@ const CrmForm = () => {
       color: "#555",
     },
     "& .MuiOutlinedInput-notchedOutline": {
-      border: "none",
+      border: "1px solid #ccc", // Ensure the border is visible
     },
   };
 
+  // Get all countries
+  const countries = Country.getAllCountries();
+
+  // Get states based on selected country
+  const states = selectedCountry ? State.getStatesOfCountry(selectedCountry.isoCode) : [];
+
+  // Get cities based on selected state
+  const cities = selectedState ? City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode) : [];
+
+  // Customer Manager options
+  const customerManagers = [
+    "Customer Manager 1",
+    "Customer Manager 2",
+    "Customer Manager 3",
+    "Customer Manager 4",
+    "Customer Manager 5",
+  ];
+
   return (
-    <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px" }}>
+    <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
       <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
-        {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
+        {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
           <form onSubmit={handleSubmit}>
             <Box
               display="grid"
@@ -121,7 +107,6 @@ const CrmForm = () => {
                 { label: "Middle Name", name: "middleName" },
                 { label: "Last Name", name: "lastName" },
                 { label: "Email Id", name: "email", type: "email" },
-                { label: "Phone No", name: "PhoneNo", type: "text" },
                 { label: "Designation", name: "designation" },
               ].map((field, index) => (
                 <TextField
@@ -140,57 +125,137 @@ const CrmForm = () => {
                 />
               ))}
 
+              {/* Phone Code Dropdown */}
+              <Autocomplete
+                fullWidth
+                options={countries}
+                getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
+                value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
+                onChange={(event, newValue) => {
+                  setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Phone Code"
+                    sx={textFieldStyles}
+                    error={!!touched.phoneCode && !!errors.phoneCode}
+                    helperText={touched.phoneCode && errors.phoneCode}
+                  />
+                )}
+                sx={{ gridColumn: "span 1" }}
+              />
+
+              {/* Phone Number Input */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Phone No"
+                name="PhoneNo"
+                value={values.PhoneNo}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.PhoneNo && !!errors.PhoneNo}
+                helperText={touched.PhoneNo && errors.PhoneNo}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+              />
+
               {/* Country Dropdown */}
-              <FormControl fullWidth sx={{ gridColumn: "span 2" }}>
-                <CountrySelect
-                  containerClassName="form-group"
-                  inputClassName="form-control"
-                  onChange={(e) => setCountryid(e.id)}
-                  placeHolder="Select Country"
-                  customRender={customRender}
-                  style={{ height: "37px", border: "none", boxShadow: "none" }}
-                />
-              </FormControl>
+              <Autocomplete
+                fullWidth
+                options={countries}
+                getOptionLabel={(option) => option.name}
+                value={selectedCountry}
+                onChange={(event, newValue) => {
+                  setSelectedCountry(newValue);
+                  setSelectedState(null); // Reset state when country changes
+                  setSelectedCity(null); // Reset city when country changes
+                  setFieldValue("country", newValue ? newValue.name : "");
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Country"
+                    sx={textFieldStyles}
+                    error={!!touched.country && !!errors.country}
+                    helperText={touched.country && errors.country}
+                  />
+                )}
+                sx={{ gridColumn: "span 2" }}
+              />
 
               {/* State Dropdown */}
-              <FormControl fullWidth sx={{ gridColumn: "span 2" }}>
-                <StateSelect
-                  countryid={countryid}
-                  containerClassName="form-group"
-                  inputClassName="form-control"
-                  onChange={(e) => setStateid(e.id)}
-                  placeHolder="Select State"
-                  customRender={customRender}
-                  style={{ height: "37px", border: "none", boxShadow: "none" }}
-                />
-              </FormControl>
+              <Autocomplete
+                fullWidth
+                options={states}
+                getOptionLabel={(option) => option.name}
+                value={selectedState}
+                onChange={(event, newValue) => {
+                  setSelectedState(newValue);
+                  setSelectedCity(null); // Reset city when state changes
+                  setFieldValue("state", newValue ? newValue.name : "");
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="State"
+                    sx={textFieldStyles}
+                    error={!!touched.state && !!errors.state}
+                    helperText={touched.state && errors.state}
+                    disabled={!selectedCountry}
+                  />
+                )}
+                sx={{ gridColumn: "span 2" }}
+                disabled={!selectedCountry}
+              />
 
               {/* City Dropdown */}
-              <FormControl fullWidth sx={{ gridColumn: "span 2" }}>
-                <CitySelect
-                  countryid={countryid}
-                  stateid={stateid}
-                  containerClassName="form-group"
-                  inputClassName="form-control"
-                  onChange={(e) => console.log(e)}
-                  placeHolder="Select City"
-                  customRender={customRender}
-                  style={{ height: "37px", border: "none", boxShadow: "none" }}
-                />
-              </FormControl>
+              <Autocomplete
+                fullWidth
+                options={cities}
+                getOptionLabel={(option) => option.name}
+                value={selectedCity}
+                onChange={(event, newValue) => {
+                  setSelectedCity(newValue);
+                  setFieldValue("city", newValue ? newValue.name : "");
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="City"
+                    sx={textFieldStyles}
+                    error={!!touched.city && !!errors.city}
+                    helperText={touched.city && errors.city}
+                    disabled={!selectedState}
+                  />
+                )}
+                sx={{ gridColumn: "span 2" }}
+                disabled={!selectedState}
+              />
 
-              {/* Phone Code Dropdown */}
-              <FormControl fullWidth sx={{ gridColumn: "span 2" }}>
-                <PhonecodeSelect
-                  countryid={countryid}
-                  value={phoneCode}
-                  containerClassName="form-group"
-                  inputClassName="form-control"
-                  onChange={(e) => setPhoneCode(e)}
-                  placeHolder="Select Phone Code"
-                  customRender={customRender}
-                  style={{ height: "37px", border: "none", boxShadow: "none" }}
-                />
+              {/* Customer Manager Dropdown */}
+              <FormControl fullWidth sx={{ gridColumn: "span 2", ...textFieldStyles }}>
+                <InputLabel>Customer Manager</InputLabel>
+                <Select
+                  name="customerManager"
+                  value={values.customerManager}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  label="Customer Manager"
+                >
+                  <MenuItem value="" disabled>
+                    Select Customer Manager
+                  </MenuItem>
+                  {customerManagers.map((manager, index) => (
+                    <MenuItem key={index} value={manager}>
+                      {manager}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {touched.customerManager && errors.customerManager && (
+                  <p style={{ color: "red", fontSize: "12px" }}>{errors.customerManager}</p>
+                )}
               </FormControl>
             </Box>
 

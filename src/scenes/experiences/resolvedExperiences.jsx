@@ -20,25 +20,25 @@ import {
   ImportExport as ImportExportIcon,
   // Add as AddIcon,
 } from "@mui/icons-material";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Initial ticket data
 const initialTickets = [
-  { id: 1, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", updated: "2 hours ago", },
-  { id: 2, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", updated: "2 hours ago", },
-  { id: 3, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", updated: "2 hours ago", },
-  { id: 4, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", updated: "2 hours ago", },
-  { id: 5, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", updated: "2 hours ago", },
-  { id: 6, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", updated: "2 hours ago", },
-  { id: 7, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", updated: "2 hours ago", },
-  { id: 8, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", updated: "2 hours ago", },
-  { id: 9, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", updated: "2 hours ago", },
-  { id: 10, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", updated: "2 hours ago", },
-  { id: 11, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", updated: "2 hours ago", },
-  { id: 12, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", updated: "2 hours ago", },
-  { id: 13, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", updated: "2 hours ago", },
-  { id: 14, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", updated: "2 hours ago", },
-  { id: 15, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", updated: "2 hours ago", },
+  { id: 1, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan", department:"technical" },
+  { id: 2, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 3, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 4, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 5, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 6, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 7, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 8, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 9, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical"  },
+  { id: 10, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical"  },
+  { id: 11, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 12, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 13, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 14, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 15, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
 ];
 
 // Columns for DataGrid
@@ -56,7 +56,7 @@ const ResolvedExperiences = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 600px)");
-  // const Navigate = useNavigate();
+  const Navigate = useNavigate();
 
   // State for tickets
   const [tickets] = useState(initialTickets); // Removed setTickets since it's unused
@@ -111,6 +111,12 @@ const ResolvedExperiences = () => {
   // };
   // Get Unique Values for Filters
   const getUniqueValues = (key) => [...new Set(tickets.map((ticket) => ticket[key]))];
+
+  
+  const handleRowClick = (params) => {
+    Navigate('/ticketdetails', { state: { ticket: params.row } });
+  };
+
 
   return (
     <Box m="20px">
@@ -325,6 +331,7 @@ const ResolvedExperiences = () => {
           rows={filteredTickets}
           columns={columns}
           pageSize={10}
+          onRowClick={handleRowClick}
         />
       </Box>
     </Box>

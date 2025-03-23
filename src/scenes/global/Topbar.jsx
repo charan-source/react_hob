@@ -18,17 +18,15 @@ import { useNavigate } from "react-router-dom";
 
 // Shared getActivePage function
 const getActivePage = (pathname) => {
-  if (pathname.includes("/crm") || pathname.includes("/crmform")) {
+  if (pathname.includes("/crm") || pathname.includes("/crmform") || pathname.includes("/crmdetails") ) {
     return "/crm";
-  } else if (pathname.includes("/cm") || pathname.includes("/cmform")) {
+  } else if (pathname.includes("/cm") || pathname.includes("/cmform") || pathname.includes("/cmdetails")) {
     return "/cm";
-  } else if (pathname.includes("/hob") || pathname.includes("/form")) {
-    return "/hob";
   } else if (pathname.includes("/notes")) {
     return "/notes";
   } else if (pathname.includes("/calendar")) {
     return "/calendar";
-  } else if (pathname.includes("/organization")) {
+  } else if (pathname.includes("/organization") || pathname.includes("/organizationdetails")  || pathname.includes("/form") ) {
     return "/organization";
   } else if (
     pathname === "/" ||
@@ -104,14 +102,20 @@ const Topbar = () => {
         return "Customer Manager";
       case "/crm":
         return "Customer Relationship Manager";
-      case "/hob":
-        return "Head of The Business";
       case "/cmform":
         return "Create a New Customer Manager";
       case "/crmform":
         return " Create a New Customer Relationship Manager";
+      case "/crmdetails":
+        return "Customer Relationship Manager Details";
+      case "/cmdetails":
+        return "Customer Manager Details";
+      case "/organizationdetails":
+          return " Organization Details";
+      case "/ticketsdetails":
+          return " Experience Details";
       case "/form":
-        return "Create a New Head of the Business Unit";
+        return "Create a New Organization";
       case "/allExperiences":
         return "All Experiences";
       case "/organization":
@@ -140,12 +144,18 @@ const Topbar = () => {
         return { primaryTitle: "Customer Manager", secondaryTitle: null };
       case "/crm":
         return { primaryTitle: "Customer Relationship Manager", secondaryTitle: null };
-      case "/hob":
+        case "/cmdetails":
+          return { primaryTitle: "Customer Manager Details ", secondaryTitle: null };
+      case "/organization":
         return { primaryTitle: "Organization", secondaryTitle: null };
-      // case "/organization":
-      //     return { primaryTitle: "Organizations", secondaryTitle: null };
+      case "/ticketdetails":
+          return { primaryTitle: "Experience Details", secondaryTitle: null };
+      case "/organizationdetails":
+          return { primaryTitle: "Organizations Details", secondaryTitle: null };
       case "/cmform":
         return { primaryTitle: "Customer Manager", secondaryTitle: "Create a New Customer Manager" };
+      case "/crmdetails":
+        return { primaryTitle: "Customer Relationship Manager Details ", secondaryTitle: null };
       case "/crmform":
         return { primaryTitle: "Customer Relationship Manager", secondaryTitle: "Create a New Customer Relationship Manager" };
       case "/form":
@@ -516,7 +526,7 @@ const Topbar = () => {
             <Item title="Dashboard" to="/" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <Item title="Customer Manager" to="/cm" icon={<PeopleAltOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <Item title="Customer Relationship Manager" to="/crm" icon={<HandshakeOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
-            <Item title="Organizations" to="/hob" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
+            <Item title="Organizations" to="/organization" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <Item title="Notes" to="/notes" icon={<DescriptionOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <Item title="Calendar" to="/calendar" icon={<CalendarTodayOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <Item title="Logout" to="/logout" icon={<LogoutOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />

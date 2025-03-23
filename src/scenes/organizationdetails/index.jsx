@@ -2,51 +2,79 @@ import { Box, Button, TextField, useMediaQuery, useTheme, Autocomplete } from "@
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
+import React, { useState, useEffect, useMemo } from 'react';
 import { Country, State, City } from 'country-state-city';
-import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
-const Form = () => {
+const OrganizationDetails = () => {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(max-width:600px)");
   const colors = tokens(theme.palette.mode); // Get theme colors
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const location = useLocation();
+  const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
+
+  // Initialize selectedCountry, selectedState, and selectedCity based on ticket data
+  useEffect(() => {
+    if (ticket.country) {
+      const country = Country.getAllCountries().find((c) => c.name === ticket.country);
+      setSelectedCountry(country || null);
+    }
+    if (ticket.state && selectedCountry) {
+      const state = State.getStatesOfCountry(selectedCountry.isoCode).find((s) => s.name === ticket.state);
+      setSelectedState(state || null);
+    }
+    if (ticket.city && selectedState) {
+      const city = City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode).find((c) => c.name === ticket.city);
+      setSelectedCity(city || null);
+    }
+  }, [ticket, selectedCountry, selectedState]);
 
   const handleFormSubmit = (values) => {
-    console.log("Form Data:", values);
+    // Combine phone code and phone number
+    const fullPhoneNumber = `${values.phoneCode}${values.PhoneNo}`;
+    console.log("Form Data:", { ...values, fullPhoneNumber });
   };
 
   const initialValues = {
-    name: "",
-    founderName: "",
-    email: "",
-    phoneCode: "",
-    phoneno: "",
-    address: "",
-    city: "",
-    province: "",
-    country: "",
-    postcode: "",
+    name: ticket.name?.split(' ')[0] || "",
+    middleName: ticket.name?.split(' ')[1] || "",
+    lastName: ticket.name?.split(' ')[2] || "",
+    street: "",
+    city: ticket.city || "",
+    state: ticket.state || "",
+    country: ticket.country || "",
+    email: ticket.email || "",
+    PhoneNo: ticket.phoneno || "",
+    phoneCode: ticket.phonenocode || "",
+    address: ticket.address || "", // New field for customer manager
+    organization: ticket.organization || "", // New field for organization
   };
 
   const checkoutSchema = yup.object().shape({
     name: yup.string().required("Required"),
-    founderName: yup.string(),
-    email: yup.string().email("Invalid email").required("Required"),
-    phoneCode: yup.string().required("Required"),
-    phoneno: yup.string().required("Required"),
-    address: yup.string().required("Required"),
+    middleName: yup.string(),
+    lastName: yup.string().required("Required"),
+    street: yup.string().required("Required"),
     city: yup.string().required("Required"),
-    province: yup.string().required("Required"),
+    state: yup.string().required("Required"),
     country: yup.string().required("Required"),
-    postcode: yup.string().required("Required"),
+    email: yup.string().email("Invalid email").required("Required"),
+    PhoneNo: yup
+      .string()
+      .matches(/^[0-9]+$/, "Only numbers are allowed")
+      .min(10, "Must be at least 10 digits")
+      .required("Required"),
+    phoneCode: yup.string().required("Required"),
+    address: yup.string().required("Required"),
+    organization: yup.string().required("Required"), // Add organization validation
   });
 
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "8px",
-      border: "1px solid #ccc",
       backgroundColor: "#ffffff",
       boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
       "&:hover": {
@@ -60,7 +88,7 @@ const Form = () => {
       color: "#555",
     },
     "& .MuiOutlinedInput-notchedOutline": {
-      border: "none",
+      border: "1px solid #ccc", // Ensure the border is visible
     },
   };
 
@@ -74,23 +102,22 @@ const Form = () => {
   const cities = selectedState ? City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode) : [];
 
   return (
-    <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px" }}>
+    <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
       <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
         {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
           <form onSubmit={handleSubmit}>
             <Box
               display="grid"
               gap="20px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? "span 4" : undefined },
-                backgroundColor: "#ffffff",
-              }}
+              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))"}
             >
+              {/* First Name, Middle Name, Last Name */}
               {[
-                { label: "First Name", name: "name" },
-                { label: "Founder Name", name: "founderName" },
+                { label: "Organization Name", name: "organization" },
+                { label: "Founder Name", name: "name" },
+                // { label: "Last Name", name: "lastName" },
                 { label: "Email Id", name: "email", type: "email" },
+                { label: "Address", name: "address", type: "address" },
               ].map((field, index) => (
                 <TextField
                   key={index}
@@ -135,34 +162,14 @@ const Form = () => {
                 variant="outlined"
                 type="text"
                 label="Phone No"
-                name="phoneno"
-                value={values.phoneno}
+                name="PhoneNo"
+                value={values.PhoneNo}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                error={!!touched.phoneno && !!errors.phoneno}
-                helperText={touched.phoneno && errors.phoneno}
+                error={!!touched.PhoneNo && !!errors.PhoneNo}
+                helperText={touched.PhoneNo && errors.PhoneNo}
                 sx={{ ...textFieldStyles, gridColumn: "span 1" }}
               />
-
-              {[
-
-                { label: "Address", name: "address" },
-              ].map((field, index) => (
-                <TextField
-                  key={index}
-                  fullWidth
-                  variant="outlined"
-                  type={field.type || "text"}
-                  label={field.label}
-                  name={field.name}
-                  value={values[field.name]}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched[field.name] && !!errors[field.name]}
-                  helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 2" }}
-                />
-              ))}
 
               {/* Country Dropdown */}
               <Autocomplete
@@ -197,15 +204,15 @@ const Form = () => {
                 onChange={(event, newValue) => {
                   setSelectedState(newValue);
                   setSelectedCity(null); // Reset city when state changes
-                  setFieldValue("province", newValue ? newValue.name : "");
+                  setFieldValue("state", newValue ? newValue.name : "");
                 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="State/Province"
+                    label="State"
                     sx={textFieldStyles}
-                    error={!!touched.province && !!errors.province}
-                    helperText={touched.province && errors.province}
+                    error={!!touched.state && !!errors.state}
+                    helperText={touched.state && errors.state}
                     disabled={!selectedCountry}
                   />
                 )}
@@ -237,25 +244,6 @@ const Form = () => {
                 disabled={!selectedState}
               />
 
-              {[
-
-                { label: "Postal Code", name: "postcode" },
-              ].map((field, index) => (
-                <TextField
-                  key={index}
-                  fullWidth
-                  variant="outlined"
-                  type={field.type || "text"}
-                  label={field.label}
-                  name={field.name}
-                  value={values[field.name]}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched[field.name] && !!errors[field.name]}
-                  helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 2" }}
-                />
-              ))}
             </Box>
 
             <Box display="flex" justifyContent="flex-end" mt="24px">
@@ -275,7 +263,7 @@ const Form = () => {
                   "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
                 }}
               >
-                Create
+                Update
               </Button>
             </Box>
           </form>
@@ -285,4 +273,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default OrganizationDetails;

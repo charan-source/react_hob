@@ -7,7 +7,7 @@ import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import Cm from "./scenes/cm";
-import Hob from "./scenes/hob";
+import Organization from "./scenes/organization";
 import Crm from "./scenes/crm";
 import Bar from "./scenes/bar";
 import Form from "./scenes/form";
@@ -26,6 +26,9 @@ import PendingExperiences from "./scenes/experiences/pendingExperiences";
 import ResolvedExperiences from "./scenes/experiences/resolvedExperiences";
 import Notes from "./scenes/notes";
 import CrmDetails from "./scenes/crmdetails";
+import CmDetails from "./scenes/cmdetails";
+import OrganizationDetails from "./scenes/organizationdetails";
+import TicketsDetails from "./scenes/ticketsdetails";
 // import { tokens } from "../../theme";
 
 function App() {
@@ -85,12 +88,13 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/cm" element={<Cm />} />
             <Route path="/crm" element={<Crm />} />
-            <Route path="/hob" element={<Hob />} />
+            <Route path="/organization" element={<Organization />} />
+            <Route path="/organizationDetails" element={<OrganizationDetails />} />
             <Route path="/form" element={<Form />} />
             <Route path="/cmform" element={<CmForm />} />
             <Route path="/crmform" element={<CrmForm />} />
             <Route path="/crmdetails" element={<CrmDetails />} />
-            
+            <Route path="/cmdetails" element={<CmDetails />} />
             <Route path="/bsuform" element={<BsuForm />} />
             <Route path="/bar" element={<Bar />} />
             <Route path="/pie" element={<Pie />} />
@@ -103,6 +107,7 @@ function App() {
 
             {/* Experience Routes */}
             <Route path="/allExperiences" element={<AllExperiences />} />
+            <Route path="/ticketdetails" element={<TicketsDetails />} />
             <Route path="/newExperiences" element={<NewExperiences />} />
             <Route path="/pendingExperiences" element={<PendingExperiences />} />
             <Route path="/resolvedExperiences" element={<ResolvedExperiences />} />

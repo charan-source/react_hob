@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -24,103 +24,16 @@ import { useNavigate } from "react-router-dom";
 
 // Initial ticket data
 const initialTickets = [
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },  
-
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },  
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },  
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },  
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },  
-  {
-    id: 616840,
-    name: "Satya Narayana",
-    email: "Satya@gmail.com",
-    phone: "1234567890",
-    city: "Visakhapatnam",
-    created: "14th March, 2025",
-  },
+  { id: 1, name: "Charan Palemala", email: "charan@gmail.com", phone: "1234567890", city: "Visakhapatnam", created: "14th March, 2025" },
+  { id: 2, name: "Satya Narayana", email: "Satya@gmail.com", phone: "1234567890", city: "Visakhapatnam", created: "14th March, 2025" },
+  { id: 3, name: "Rambabu bade", email: "john@gmail.com", phone: "1234567890", city: "New York", created: "15th March, 2025" },
+  { id: 4, name: "Charan Palemala", email: "charan@gmail.com", phone: "1234567890", city: "Visakhapatnam", created: "14th March, 2025" },
+  { id: 5, name: "Satya Narayana", email: "Satya@gmail.com", phone: "1234567890", city: "Visakhapatnam", created: "14th March, 2025" },
+  { id: 6, name: "John Doe", email: "john@gmail.com", phone: "1234567890", city: "New York", created: "15th March, 2025" },
+  { id: 7, name: "Charan Palemala", email: "charan@gmail.com", phone: "1234567890", city: "Visakhapatnam", created: "14th March, 2025" },
+  { id: 8, name: "Satya Narayana", email: "Satya@gmail.com", phone: "1234567890", city: "Visakhapatnam", created: "14th March, 2025" },
+  { id: 9, name: "John Doe", email: "john@gmail.com", phone: "1234567890", city: "New York", created: "15th March, 2025" },
+  // Add more tickets with unique IDs
 ];
 
 // Columns for DataGrid
@@ -138,6 +51,7 @@ const Crm = () => {
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 600px)");
   const Navigate = useNavigate();
+  const [tickets, setTickets] = useState(initialTickets);
 
   // State for tickets
   // const [tickets] = useState(initialTickets); // Removed setTickets since it's unused
@@ -148,8 +62,13 @@ const Crm = () => {
 
   // Search filter
   const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-    // applyFilters(event.target.value, selectedFilters);
+    const searchTerm = event.target.value.toLowerCase();
+    const filteredTickets = initialTickets.filter((ticket) =>
+      Object.values(ticket).some((value) =>
+        String(value).toLowerCase().includes(searchTerm)
+      )
+    );
+    setTickets(filteredTickets);
   };
 
   // Open & Close Filter Menu
@@ -186,9 +105,17 @@ const Crm = () => {
   //   }
   //   setFilteredTickets(filtered);
   // };
+  useEffect(() => {
+    // Fetch or update tickets here
+    setTickets(initialTickets);
+  }, [initialTickets]);
 
   const handleNewTicket = () => {
     Navigate('/crmform')
+  };
+
+  const handleRowClick = (params) => {
+    Navigate('/crmdetails', { state: { ticket: params.row } });
   };
 
   // Get Unique Values for Filters
@@ -339,14 +266,75 @@ const Crm = () => {
           },
         }}>
         <DataGrid
-                sx={{
-                  "& .MuiDataGrid-columnSeparator": {
-                   display: "none !important", // Ensures it overrides MUI defaults
-                  },
-                }}
-          rows={initialTickets}
+             sx={{
+              "& .MuiDataGrid-cell": {
+                borderBottom: "none",
+                fontSize: "16px",
+                whiteSpace: "nowrap", // Prevent text wrapping
+                overflow: "visible", // Prevent text truncation
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: colors.blueAccent[700],
+                borderBottom: "none", // Remove the border below the header
+                fontWeight: "bold !important",
+                fontSize: "16px !important",
+                color: "#ffffff",
+              },
+              // "& .MuiDataGrid-root::-webkit-scrollbar-thumb":{
+              //    width: "2px !important",
+              //    height: "6px !important"
+              //  },
+              "& .MuiDataGrid-columnSeparator": {
+                display: "none", // Hide the column separator
+              },
+              // "& .MuiDataGrid-root::-webkit-scrollbar": {
+              //   display: "none", // Hides scrollbar in Chrome, Safari
+              // },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold !important", // Ensure header text is bold
+              },
+              // "& .MuiDataGrid-virtualScroller": {
+              //   backgroundColor: "#ffffff",
+              // },
+              "& .MuiDataGrid-root::-webkit-scrollbar": {
+                display: "none !important",
+              },
+              "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+                display: "none !important",
+              },
+              "& .MuiDataGrid-root": {
+                // scrollbarWidth: "none !important", // Hides scrollbar in Firefox
+              },
+              "& .MuiDataGrid-virtualScroller": {
+                // scrollbarWidth: "none !important",
+                backgroundColor: "#ffffff",
+              },
+              "& .MuiDataGrid-row": {
+                borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
+              },
+              "& .MuiTablePagination-root": {
+                color: "#ffffff !important", // Ensure pagination text is white
+              },
+              "& .MuiTablePagination-selectLabel, & .MuiTablePagination-input": {
+                color: "#ffffff !important", // Ensure select label and input text are white
+              },
+              "& .MuiTablePagination-displayedRows": {
+                color: "#ffffff !important", // Ensure displayed rows text is white
+              },
+              "& .MuiSvgIcon-root": {
+                color: "#ffffff !important", // Ensure pagination icons are white
+              },
+              "& .MuiDataGrid-footerContainer": {
+                borderTop: "none",
+                backgroundColor: colors.blueAccent[700],
+                color: "#ffffff",
+              },
+            }}
+          // rows={initialTickets}
           columns={columns}
+          rows={tickets}
           pageSize={10}
+          onRowClick={handleRowClick}
         />
       </Box>
     </Box>

@@ -25,6 +25,7 @@ import NewExperiences from "./scenes/experiences/newExperiences";
 import PendingExperiences from "./scenes/experiences/pendingExperiences";
 import ResolvedExperiences from "./scenes/experiences/resolvedExperiences";
 import Notes from "./scenes/notes";
+import CrmDetails from "./scenes/crmdetails";
 // import { tokens } from "../../theme";
 
 function App() {
@@ -88,6 +89,8 @@ function App() {
             <Route path="/form" element={<Form />} />
             <Route path="/cmform" element={<CmForm />} />
             <Route path="/crmform" element={<CrmForm />} />
+            <Route path="/crmdetails" element={<CrmDetails />} />
+            
             <Route path="/bsuform" element={<BsuForm />} />
             <Route path="/bar" element={<Bar />} />
             <Route path="/pie" element={<Pie />} />

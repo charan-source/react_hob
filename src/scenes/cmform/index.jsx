@@ -2,13 +2,31 @@ import { Box, Button, TextField, useMediaQuery, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
-// import Header from "../../components/Header";
+import Select from '@mui/material/Select';
+// import Grid from '@mui/material/Grid';
+// import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import React from 'react';
 
+// import Header from "../../components/Header";
+// const customRender = ({ options, customProps, ...selectProps }) => (
+//   <Select {...selectProps} {...customProps}>
+//     {options.map(({ label, value, key }) => (
+//       <MenuItem value={value} key={key}>
+//         {label}
+//       </MenuItem>
+//     ))}
+//   </Select>
+// );
 
 const CmForm = () => {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(max-width:600px)");
   const colors = tokens(theme.palette.mode); // Get theme colors
+  // const [country, setCountry] = React.useState('');
+  // const [region, setRegion] = React.useState('');
 
   const handleFormSubmit = (values) => {
     console.log("Form Data:", values);
@@ -25,6 +43,7 @@ const CmForm = () => {
     country: "",
     email: "",
     PhoneNo: "",
+    dropdownSelection: "",
     // subject: "",
   };
 
@@ -68,36 +87,29 @@ const CmForm = () => {
   };
 
   return (
-    <Box m="15px" sx={{ backgroundColor:"#ffffff", padding:"20px"
+    <Box m="15px" sx={{
+      backgroundColor: "#ffffff", padding: "20px"
 
     }}>
       {/* <Header title="Create CM" subtitle="Create a New Customer Manager Profile" /> */}
 
-      <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit} sx={{backgroundColor:"#ffffff"}}>
+      <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit} sx={{ backgroundColor: "#ffffff" }}>
         {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
           <form onSubmit={handleSubmit} >
             <Box
               display="grid"
               gap="20px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? "span 4" : undefined },
-               backgroundColor:"#ffffff",
-              //  padding:"10px"
-              }}
+              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))"}
             >
+
+              {/* First Name, Middle Name, Last Name, Designation */}
               {[
                 { label: "First Name", name: "firstName" },
                 { label: "Middle Name", name: "middleName" },
                 { label: "Last Name", name: "lastName" },
-                { label: "Designation", name: "designation" },
-                { label: "Street", name: "street" },
-                { label: "City", name: "city" },
-                { label: "State", name: "state" },
-                { label: "Country", name: "country" },
-                { label: "Email Id", name: "email", type: "email" },
-                { label: "Phone No", name: "PhoneNo", type: "text" },
-                // { label: "Subject", name: "subject" },
+                { label: "Email", name: "lastName" },
+                { label: "Phone No", name: "phoneno" },
+
               ].map((field, index) => (
                 <TextField
                   key={index}
@@ -114,30 +126,100 @@ const CmForm = () => {
                   sx={{ ...textFieldStyles, gridColumn: "span 2" }}
                 />
               ))}
+
+
+              {/* Country and State Dropdowns First */}
+              {/* <FormControl fullWidth sx={{ gridColumn: "span 2", ...textFieldStyles }}>
+                <InputLabel>Country</InputLabel>
+                <CountryDropdown
+                  value={country}
+                  onChange={(val) => {
+                    setCountry(val);
+                    setRegion('');
+                  }}
+                  style={{
+                    width: "100%",
+                    height: "50px",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    padding: "8px 12px",
+                    backgroundColor: "#ffffff",
+                    boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+                  }}
+                  customRender={customRender}
+                />
+              </FormControl>
+
+              <FormControl fullWidth sx={{ gridColumn: "span 2", ...textFieldStyles }}>
+                <InputLabel>State</InputLabel>
+                <RegionDropdown
+                  country={country}
+                  value={region}
+                  onChange={(val) => setRegion(val)}
+                  disableWhenEmpty={true}
+                  style={{
+                    width: "100%",
+                    height: "50px",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    padding: "8px 12px",
+                    backgroundColor: "#ffffff",
+                    boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+                  }}
+                  customRender={customRender}
+                />
+              </FormControl> */}
+
+              <FormControl fullWidth sx={{ gridColumn: "span 2", ...textFieldStyles }}>
+                    <InputLabel>Organization</InputLabel>
+                    <Select
+                      name="dropdownSelection"
+                      value={values.dropdownSelection}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    >
+                      <MenuItem value="">Select</MenuItem> {/* Ensure a default selection */}
+                      <MenuItem value="Option 1">Wipro</MenuItem>
+                      <MenuItem value="Option 2">Tata</MenuItem>
+                      <MenuItem value="Option 3">Relience</MenuItem>
+                      <MenuItem value="Option 4">Santoor</MenuItem>
+                    </Select>
+                    {touched.dropdownSelection && errors.dropdownSelection && (
+                      <p style={{ color: "red", fontSize: "12px" }}>{errors.dropdownSelection}</p>
+                    )}
+                  </FormControl>
+
+
+
+              {/* Email & Phone No */}
+
             </Box>
 
-            <Box display="flex" justifyContent="flex-end" mt="24px">
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    padding: "12px 24px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    borderRadius: "8px",
-                    boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                    transition: "0.3s",
-                    backgroundColor: colors.blueAccent[700],
-                    color:"#ffffff",
-                    textTransform:"none",
 
-                    "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
-                  }}
-                >
-                  
-                  Create 
-                </Button>
-              </Box>
+            {/* </Grid> */}
+
+            <Box display="flex" justifyContent="flex-end" mt="24px">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  padding: "12px 24px",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                  transition: "0.3s",
+                  backgroundColor: colors.blueAccent[700],
+                  color: "#ffffff",
+                  textTransform: "none",
+
+                  "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                }}
+              >
+
+                Create
+              </Button>
+            </Box>
           </form>
         )}
       </Formik>

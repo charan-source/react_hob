@@ -157,7 +157,13 @@ const CrmDetails = () => {
                   onBlur={handleBlur}
                   error={!!touched[field.name] && !!errors[field.name]}
                   helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                  sx={{
+                    ...textFieldStyles,
+                    "& .MuiInputBase-input.Mui-disabled": {
+                      WebkitTextFillColor: "#000", // Keep text color black when disabled
+                    },
+                     gridColumn: "span 1"
+                  }}
                   disabled={!isEditing} // Disable if not in editing mode
                 />
               ))}
@@ -174,7 +180,13 @@ const CrmDetails = () => {
                 onBlur={handleBlur}
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
-                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                sx={{
+                  ...textFieldStyles,
+                  "& .MuiInputBase-input.Mui-disabled": {
+                    WebkitTextFillColor: "#000", // Keep text color black when disabled
+                  },
+                   gridColumn: "span 1"
+                }}
                 disabled={!isEditing} // Disable if not in editing mode
               />
 
@@ -199,6 +211,13 @@ const CrmDetails = () => {
                       disabled={!isEditing} // Disable if not in editing mode
                     />
                   )}
+                  sx={{
+                    ...textFieldStyles,
+                    "& .MuiInputBase-input.Mui-disabled": {
+                      WebkitTextFillColor: "#000",
+                    },
+                
+                  }}
                   disabled={!isEditing} // Disable if not in editing mode
                 />
 
@@ -214,7 +233,13 @@ const CrmDetails = () => {
                   onBlur={handleBlur}
                   error={!!touched.PhoneNo && !!errors.PhoneNo}
                   helperText={touched.PhoneNo && errors.PhoneNo}
-                  sx={textFieldStyles}
+                  sx={{
+                    ...textFieldStyles,
+                    "& .MuiInputBase-input.Mui-disabled": {
+                      WebkitTextFillColor: "#000", // Keep text color black when disabled
+                    },
+                
+                  }}
                   disabled={!isEditing} // Disable if not in editing mode
                 />
               </Box>
@@ -241,7 +266,13 @@ const CrmDetails = () => {
                     disabled={!isEditing} // Disable if not in editing mode
                   />
                 )}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  ...textFieldStyles,
+                  "& .MuiInputBase-input.Mui-disabled": {
+                    WebkitTextFillColor: "#000",
+                  },
+                   gridColumn: "span 1"
+                }}
                 disabled={!isEditing} // Disable if not in editing mode
               />
 
@@ -266,7 +297,13 @@ const CrmDetails = () => {
                     disabled={!selectedCountry || !isEditing} // Disable if not in editing mode
                   />
                 )}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  ...textFieldStyles,
+                  "& .MuiInputBase-input.Mui-disabled": {
+                    WebkitTextFillColor: "#000",
+                  },
+                   gridColumn: "span 1"
+                }}
                 disabled={!selectedCountry || !isEditing} // Disable if not in editing mode
               />
 
@@ -290,7 +327,13 @@ const CrmDetails = () => {
                     disabled={!selectedState || !isEditing} // Disable if not in editing mode
                   />
                 )}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  ...textFieldStyles,
+                  "& .MuiInputBase-input.Mui-disabled": {
+                    WebkitTextFillColor: "#000",
+                  },
+                   gridColumn: "span 1"
+                }}
                 disabled={!selectedState || !isEditing} // Disable if not in editing mode
               />
 
@@ -304,6 +347,13 @@ const CrmDetails = () => {
                   onBlur={handleBlur}
                   label="Organization"
                   disabled={!isEditing} // Disable if not in editing mode
+                  sx={{
+                    ...textFieldStyles,
+                    "& .MuiInputBase-input.Mui-disabled": {
+                      WebkitTextFillColor: "#000",
+                    },
+                   
+                  }}
                 >
                   <MenuItem value="" disabled>
                     Select Organization
@@ -329,6 +379,13 @@ const CrmDetails = () => {
                   onBlur={handleBlur}
                   label="Customer Manager"
                   disabled={!isEditing} // Disable if not in editing mode
+                  sx={{
+                    ...textFieldStyles,
+                    "& .MuiInputBase-input.Mui-disabled": {
+                      WebkitTextFillColor: "#000",
+                    },
+                     gridColumn: "span 1"
+                  }}
                 >
                   <MenuItem value="" disabled>
                     Select Customer Manager

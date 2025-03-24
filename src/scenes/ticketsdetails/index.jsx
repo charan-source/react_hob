@@ -140,7 +140,30 @@ const TicketDetails = () => {
                 sx={{ ...textFieldStyles, gridColumn: "span 1" }}
                 disabled={!isEditing} // Disable in non-editing mode
               />
-
+          {/* Experience */}
+          <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Experience"
+                name="experience"
+                value={values.experience}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.experience && !!errors.experience}
+                helperText={touched.experience && errors.experience}
+                sx={{
+                  ...textFieldStyles,
+                  gridColumn: "span 1",
+                  "& .MuiOutlinedInput-input": {
+                    color: getExperienceColor(values.experience), // Dynamically set text color
+                  },
+                  "& .MuiOutlinedInput-input.Mui-disabled": {
+                    WebkitTextFillColor: getExperienceColor(values.experience), // Override disabled text color
+                  },
+                }}
+                disabled={!isEditing} // Disable in non-editing mode
+              />
               {/* Priority */}
               <TextField
                 fullWidth
@@ -173,30 +196,7 @@ const TicketDetails = () => {
                 disabled={!isEditing} // Disable in non-editing mode
               />
 
-              {/* Experience */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                type="text"
-                label="Experience"
-                name="experience"
-                value={values.experience}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={!!touched.experience && !!errors.experience}
-                helperText={touched.experience && errors.experience}
-                sx={{
-                  ...textFieldStyles,
-                  gridColumn: "span 1",
-                  "& .MuiOutlinedInput-input": {
-                    color: getExperienceColor(values.experience), // Dynamically set text color
-                  },
-                  "& .MuiOutlinedInput-input.Mui-disabled": {
-                    WebkitTextFillColor: getExperienceColor(values.experience), // Override disabled text color
-                  },
-                }}
-                disabled={!isEditing} // Disable in non-editing mode
-              />
+    
 
               {/* Status */}
               <TextField

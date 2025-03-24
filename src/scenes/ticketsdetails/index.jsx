@@ -141,7 +141,7 @@ const TicketDetails = () => {
 
               <Box sx={{ gridColumn: "span 1" }}>
                 <Box sx={{ fontSize: "14px", fontWeight: "bold", color: "#555" }}>Priority</Box>
-                <Box sx={{ fontSize: "16px" }}>{values.priority}</Box>
+                <Box sx={{ fontSize: "16px", color: getExperienceColor(values.priority) }}>{values.priority}</Box>
               </Box>
               
               {/* Status */}

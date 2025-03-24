@@ -1,4 +1,4 @@
-import { Box, Button, TextField, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, TextField, useMediaQuery, useTheme, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -14,7 +14,7 @@ const TicketDetails = () => {
 
   // Memoize the ticket object to avoid unnecessary re-renders
   const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
-
+  console.log("Ticket:", ticket);
   // Function to determine the color based on experience
   const getExperienceColor = (experience) => {
     switch (experience) {
@@ -98,6 +98,13 @@ const TicketDetails = () => {
     },
   };
 
+  const CrmDetails = [
+    { id: 1, crmname: "charan" },
+    { id: 2, crmname: "charan" },
+    { id: 3, crmname: "charan" },
+    { id: 4, crmname: "charan" },
+  ];
+
   return (
     <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
       <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
@@ -108,8 +115,6 @@ const TicketDetails = () => {
               gap="20px"
               gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
             >
-
-
               <TextField
                 fullWidth
                 variant="outlined"
@@ -140,8 +145,9 @@ const TicketDetails = () => {
                 sx={{ ...textFieldStyles, gridColumn: "span 1" }}
                 disabled={!isEditing} // Disable in non-editing mode
               />
-          {/* Experience */}
-          <TextField
+
+              {/* Experience */}
+              <TextField
                 fullWidth
                 variant="outlined"
                 type="text"
@@ -164,6 +170,7 @@ const TicketDetails = () => {
                 }}
                 disabled={!isEditing} // Disable in non-editing mode
               />
+
               {/* Priority */}
               <TextField
                 fullWidth
@@ -180,23 +187,24 @@ const TicketDetails = () => {
                 disabled={!isEditing} // Disable in non-editing mode
               />
 
-              {/* Customer Relationship Manager Name */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                type="text"
-                label="Customer Relationship Manager Name"
+            <FormControl fullWidth sx={{ ...textFieldStyles, gridColumn: "span 1" }}>
+              <InputLabel>Customer Relationship Manager</InputLabel>
+              <Select
+                label="Customer Relationship Manager"
                 name="crmname"
                 value={values.crmname}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={!!touched.crmname && !!errors.crmname}
-                helperText={touched.crmname && errors.crmname}
-                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
-                disabled={!isEditing} // Disable in non-editing mode
-              />
-
-    
+                disabled={!isEditing}
+              >
+                {CrmDetails.map((crm) => (
+                  <MenuItem key={crm.id} value={crm.crmname}>
+                    {crm.crmname}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
               {/* Status */}
               <TextField

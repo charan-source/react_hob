@@ -100,6 +100,9 @@ const OrganizationDetails = () => {
     },
   };
 
+
+
+
   // Get all countries
   const countries = Country.getAllCountries();
 

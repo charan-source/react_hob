@@ -24,21 +24,21 @@ import { useNavigate } from "react-router-dom";
 
 // Initial ticket data
 const initialTickets = [
-  { id: 1, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan", department:"technical" },
-  { id: 2, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 3, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 4, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 5, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 6, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 7, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 8, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 9, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical"  },
-  { id: 10, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical"  },
-  { id: 11, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 12, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 13, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 14, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
-  { id: 15, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" },
+  { id: 1, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan", department:"technical", experience : "Extremely Frustrated", organization: "Wipro" },
+  { id: 2, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical", experience : "Frustrated", organization: "Infosys"  },
+  { id: 3, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical", experience : "Happy", organization: "TCS"  },
+  { id: 4, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical", experience : "Extremely Happy", organization: "HCL"  },
+  { id: 5, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical", experience : "Extremely Frustrated", organization: "Tech Mahindra"  },
+  { id: 6, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical", experience : "Extremely Frustrated", organization: ""  },
+  { id: 7, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical", experience : "Happy", organization: "HCL"  },
+  { id: 8, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago",cmname: "satya", crmname:"charan",  department:"technical", experience : "Extremely Frustrated", organization: "Infosys"  },
+  { id: 9, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" , experience :  "Extremely Happy", organization: "Wipro"  },
+  { id: 10, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical" , experience : "Happy", organization: "Infosys"   },
+  { id: 11, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical", experience : "Extremely Frustrated", organization: "TCS"  },
+  { id: 12, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical", experience : "Happy", organization: "Tech Mahindra"   },
+  { id: 13, subject: "Issue A", priority: "High", status: "Open", date: "2024-03-19", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical", experience : "Extremely Frustrated", organization: "HCL"  },
+  { id: 14, subject: "Issue B", priority: "Low", status: "Closed", date: "2024-03-18", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical", experience : "Extremely Happy", organization: "Wipro"  },
+  { id: 15, subject: "Issue C", priority: "Medium", status: "In Progress", date: "2024-03-17", time: "23:15:00" , updated: "2 hours ago", cmname: "satya", crmname:"charan",  department:"technical", experience : "Extremely Happy", organization: "TCS"  },
 ];
 
 // Columns for DataGrid

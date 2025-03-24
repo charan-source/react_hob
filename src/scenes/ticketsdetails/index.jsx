@@ -15,8 +15,21 @@ const TicketDetails = () => {
   // Memoize the ticket object to avoid unnecessary re-renders
   const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
 
-  // Define countries with phone codes
-
+  // Function to determine the color based on experience
+  const getExperienceColor = (experience) => {
+    switch (experience) {
+      case "Frustrated":
+        return "#E64A19"; // Darker orange for frustration
+      case "Extremely Frustrated":
+        return "#D32F2F"; // Darker red for extreme frustration
+      case "Happy":
+        return "#FBC02D"; // Darker yellow for happiness
+      case "Extremely Happy":
+        return "#388E3C"; // Darker green for extreme happiness
+      default:
+        return "#616161"; // Darker grey for default
+    }
+  };
 
   const handleFormSubmit = (values) => {
     // Combine phone code and phone number
@@ -25,18 +38,16 @@ const TicketDetails = () => {
     setIsEditing(false); // Disable inputs after saving
   };
 
-  // const handleEdit = () => {
-  //   setIsEditing(true); // Enable inputs when Edit button is clicked
-  // };
-
   const handleCancel = () => {
     setIsEditing(false); // Exit editing mode without saving
   };
 
   // Define initialValues based on ticket data
   const initialValues = {
-    cmname: ticket.cmname?.split(' ')[0] || "",
+    organization: ticket.organization || "",
+    cmname: ticket.cmname || "",
     priority: ticket.priority || "",
+    experience: ticket.experience || "",
     crmname: ticket.crmname || "",
     status: ticket.status || "",
     department: ticket.department || "",
@@ -48,6 +59,7 @@ const TicketDetails = () => {
   };
 
   const checkoutSchema = yup.object().shape({
+    organization: yup.string().required("Required"),
     cmname: yup.string().required("Required"),
     priority: yup.string().required("Required"),
     crmname: yup.string().required("Required"),
@@ -96,6 +108,23 @@ const TicketDetails = () => {
               gap="20px"
               gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
             >
+
+
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Organization"
+                name="organization"
+                value={values.organization}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.organization && !!errors.organization}
+                helperText={touched.organization && errors.organization}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled={!isEditing} // Disable in non-editing mode
+              />
+
               {/* Customer Manager Name */}
               <TextField
                 fullWidth
@@ -144,6 +173,31 @@ const TicketDetails = () => {
                 disabled={!isEditing} // Disable in non-editing mode
               />
 
+              {/* Experience */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Experience"
+                name="experience"
+                value={values.experience}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.experience && !!errors.experience}
+                helperText={touched.experience && errors.experience}
+                sx={{
+                  ...textFieldStyles,
+                  gridColumn: "span 1",
+                  "& .MuiOutlinedInput-input": {
+                    color: getExperienceColor(values.experience), // Dynamically set text color
+                  },
+                  "& .MuiOutlinedInput-input.Mui-disabled": {
+                    WebkitTextFillColor: getExperienceColor(values.experience), // Override disabled text color
+                  },
+                }}
+                disabled={!isEditing} // Disable in non-editing mode
+              />
+
               {/* Status */}
               <TextField
                 fullWidth
@@ -175,7 +229,6 @@ const TicketDetails = () => {
                 sx={{ ...textFieldStyles, gridColumn: "span 1" }}
                 disabled={!isEditing} // Disable in non-editing mode
               />
-
 
               {/* Date */}
               <TextField
@@ -277,7 +330,7 @@ const TicketDetails = () => {
                       fontWeight: "bold",
                       borderRadius: "8px",
                       boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                      marginLeft:"5px",
+                      marginLeft: "5px",
                       transition: "0.3s",
                       backgroundColor: colors.redAccent[600],
                       color: "#ffffff",

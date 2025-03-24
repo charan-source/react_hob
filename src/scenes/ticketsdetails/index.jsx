@@ -185,7 +185,7 @@ const TicketDetails = () => {
               <Box sx={{ width: !isNonMobile ? "30%" : "100%"  }}> {/* Adjust the width as needed */}
                 <FormControl fullWidth sx={{ ...textFieldStyles }}>
                   <Select
-                    label="Customer Relationship Manager"
+                    // label="Customer Relationship Manager"
                     name="crmname"
                     value={values.crmname}
                     onChange={handleChange}

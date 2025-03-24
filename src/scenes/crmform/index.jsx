@@ -50,7 +50,7 @@ const CrmForm = () => {
       .min(10, "Must be at least 10 digits")
       .required("Required"),
     phoneCode: yup.string().required("Required"),
-    customerManager: yup.string().required("Required"), // Validation for customer manager
+    customerManager: yup.string().required(""), // Validation for customer manager
   });
 
   const textFieldStyles = {
@@ -99,7 +99,7 @@ const CrmForm = () => {
             <Box
               display="grid"
               gap="20px"
-              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))"}
+              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
             >
               {/* First Name, Middle Name, Last Name, Designation */}
               {[
@@ -121,45 +121,50 @@ const CrmForm = () => {
                   onBlur={handleBlur}
                   error={!!touched[field.name] && !!errors[field.name]}
                   helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
                 />
               ))}
 
-              {/* Phone Code Dropdown */}
-              <Autocomplete
-                fullWidth
-                options={countries}
-                getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
-                value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
-                onChange={(event, newValue) => {
-                  setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Phone Code"
-                    sx={textFieldStyles}
-                    error={!!touched.phoneCode && !!errors.phoneCode}
-                    helperText={touched.phoneCode && errors.phoneCode}
-                  />
-                )}
-                sx={{ gridColumn: "span 1" }}
-              />
-
-              {/* Phone Number Input */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                type="text"
-                label="Phone No"
-                name="PhoneNo"
-                value={values.PhoneNo}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={!!touched.PhoneNo && !!errors.PhoneNo}
-                helperText={touched.PhoneNo && errors.PhoneNo}
-                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
-              />
+              <Box sx={{ gridColumn: "span 1", display: "flex", gap: "10px" }}>
+                           {/* Phone Code Dropdown */}
+                           <Autocomplete
+                             fullWidth
+                             options={countries}
+                             getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
+                             value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
+                             onChange={(event, newValue) => {
+                               setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
+                             }}
+                             renderInput={(params) => (
+                               <TextField
+                                 {...params}
+                                 label="Phone Code"
+                                 sx={textFieldStyles}
+                                 error={!!touched.phoneCode && !!errors.phoneCode}
+                                 helperText={touched.phoneCode && errors.phoneCode}
+                                 
+                               />
+                             )}
+              
+                           />
+           
+                           {/* Phone Number Input */}
+                           <TextField
+                             fullWidth
+                             variant="outlined"
+                             type="text"
+                             label="Phone No"
+                             name="PhoneNo"
+                             value={values.PhoneNo}
+                             onChange={handleChange}
+                             onBlur={handleBlur}
+                             error={!!touched.PhoneNo && !!errors.PhoneNo}
+                             helperText={touched.PhoneNo && errors.PhoneNo}
+                             sx={textFieldStyles}
+                        
+                           />
+               </Box>
+           
 
               {/* Country Dropdown */}
               <Autocomplete
@@ -182,7 +187,7 @@ const CrmForm = () => {
                     helperText={touched.country && errors.country}
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
 
               {/* State Dropdown */}
@@ -206,7 +211,7 @@ const CrmForm = () => {
                     disabled={!selectedCountry}
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
                 disabled={!selectedCountry}
               />
 
@@ -230,12 +235,12 @@ const CrmForm = () => {
                     disabled={!selectedState}
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
                 disabled={!selectedState}
               />
 
               {/* Customer Manager Dropdown */}
-              <FormControl fullWidth sx={{ gridColumn: "span 2", ...textFieldStyles }}>
+              <FormControl fullWidth sx={{ gridColumn: "span 1", ...textFieldStyles }}>
                 <InputLabel>Customer Manager</InputLabel>
                 <Select
                   name="customerManager"

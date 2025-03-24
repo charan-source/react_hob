@@ -81,9 +81,9 @@ const Form = () => {
             <Box
               display="grid"
               gap="20px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
               sx={{
-                "& > div": { gridColumn: isNonMobile ? "span 4" : undefined },
+                "& > div": { gridColumn: isNonMobile ? "span 3" : undefined },
                 backgroundColor: "#ffffff",
               }}
             >
@@ -104,45 +104,50 @@ const Form = () => {
                   onBlur={handleBlur}
                   error={!!touched[field.name] && !!errors[field.name]}
                   helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
                 />
               ))}
 
-              {/* Phone Code Dropdown */}
-              <Autocomplete
-                fullWidth
-                options={countries}
-                getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
-                value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
-                onChange={(event, newValue) => {
-                  setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Phone Code"
-                    sx={textFieldStyles}
-                    error={!!touched.phoneCode && !!errors.phoneCode}
-                    helperText={touched.phoneCode && errors.phoneCode}
-                  />
-                )}
-                sx={{ gridColumn: "span 1" }}
-              />
-
-              {/* Phone Number Input */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                type="text"
-                label="Phone No"
-                name="phoneno"
-                value={values.phoneno}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={!!touched.phoneno && !!errors.phoneno}
-                helperText={touched.phoneno && errors.phoneno}
-                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
-              />
+                  <Box sx={{ gridColumn: "span 1", display: "flex", gap: "10px" }}>
+                                       {/* Phone Code Dropdown */}
+                                       <Autocomplete
+                                         fullWidth
+                                         options={countries}
+                                         getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
+                                         value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
+                                         onChange={(event, newValue) => {
+                                           setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
+                                         }}
+                                         renderInput={(params) => (
+                                           <TextField
+                                             {...params}
+                                             label="Phone Code"
+                                             sx={textFieldStyles}
+                                             error={!!touched.phoneCode && !!errors.phoneCode}
+                                             helperText={touched.phoneCode && errors.phoneCode}
+                                             
+                                           />
+                                         )}
+                          
+                                       />
+                       
+                                       {/* Phone Number Input */}
+                                       <TextField
+                                         fullWidth
+                                         variant="outlined"
+                                         type="text"
+                                         label="Phone No"
+                                         name="PhoneNo"
+                                         value={values.PhoneNo}
+                                         onChange={handleChange}
+                                         onBlur={handleBlur}
+                                         error={!!touched.PhoneNo && !!errors.PhoneNo}
+                                         helperText={touched.PhoneNo && errors.PhoneNo}
+                                         sx={textFieldStyles}
+                                    
+                                       />
+                           </Box>
+                       
 
               {[
 
@@ -160,7 +165,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   error={!!touched[field.name] && !!errors[field.name]}
                   helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
                 />
               ))}
 
@@ -185,7 +190,7 @@ const Form = () => {
                     helperText={touched.country && errors.country}
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
 
               {/* State Dropdown */}
@@ -209,7 +214,7 @@ const Form = () => {
                     disabled={!selectedCountry}
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
                 disabled={!selectedCountry}
               />
 
@@ -233,7 +238,7 @@ const Form = () => {
                     disabled={!selectedState}
                   />
                 )}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
                 disabled={!selectedState}
               />
 
@@ -253,7 +258,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   error={!!touched[field.name] && !!errors[field.name]}
                   helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 2" }}
+                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
                 />
               ))}
             </Box>

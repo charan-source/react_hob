@@ -44,6 +44,7 @@ const TicketDetails = () => {
     organization: ticket.organization || "",
     cmname: ticket.cmname || "",
     experience: ticket.experience || "",
+    priority: ticket.priority || "",
     crmname: ticket.crmname || "",
     status: ticket.status || "",
     department: ticket.department || "",
@@ -138,6 +139,11 @@ const TicketDetails = () => {
                 <Box sx={{ fontSize: "16px", color: getExperienceColor(values.experience) }}>{values.experience}</Box>
               </Box>
 
+              <Box sx={{ gridColumn: "span 1" }}>
+                <Box sx={{ fontSize: "14px", fontWeight: "bold", color: "#555" }}>Priority</Box>
+                <Box sx={{ fontSize: "16px" }}>{values.priority}</Box>
+              </Box>
+              
               {/* Status */}
               <Box sx={{ gridColumn: "span 1" }}>
                 <Box sx={{ fontSize: "14px", fontWeight: "bold", color: "#555" }}>Status</Box>
@@ -163,7 +169,7 @@ const TicketDetails = () => {
               </Box>
 
 
-
+           
             </Box>
 
             <Box sx={{ display: "flex", flexDirection: "column", paddingLeft: "20px", gap: "20px", marginTop: "10px" }}>

@@ -176,7 +176,7 @@ const TicketDetails = () => {
 
               <Box sx={{ fontSize: "14px", fontWeight: "bold", color: "#555" }}>Customer Relationship Manager</Box>
 
-              <Box sx={{ width: "30%" }}> {/* Adjust the width as needed */}
+              <Box sx={{ width: !isNonMobile ? "30%" : "100%"  }}> {/* Adjust the width as needed */}
                 <FormControl fullWidth sx={{ ...textFieldStyles }}>
                   <Select
                     label="Customer Relationship Manager"

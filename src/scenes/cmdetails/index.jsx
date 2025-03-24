@@ -369,7 +369,7 @@ const CmDetails = () => {
                   disabled={!isEditing} // Disable in non-editing mode
                 >
                   <MenuItem value="" disabled>
-                    Select Customer Manager
+                    Select Customer Relationship Manager
                   </MenuItem>
                   {customerManagers.map((manager, index) => (
                     <MenuItem key={index} value={manager}>

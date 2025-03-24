@@ -2,14 +2,14 @@ import { Box, Button, useMediaQuery, useTheme, Select, MenuItem, FormControl } f
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const TicketDetails = () => {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(max-width:600px)");
   const colors = tokens(theme.palette.mode); // Get theme colors
-  // const [isEditing, setIsEditing] = useState(false); // State to manage editing mode
+  const [isEditing, setIsEditing] = useState(false); // State to manage editing mode
   const location = useLocation();
 
   // Memoize the ticket object to avoid unnecessary re-renders
@@ -103,6 +103,12 @@ const TicketDetails = () => {
     { id: 4, crmname: "charan" },
   ];
 
+
+  const handleCancel = () => {
+    setIsEditing(false); // Exit editing mode without saving
+  };
+
+
   return (
     <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
       <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
@@ -185,6 +191,7 @@ const TicketDetails = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={!!touched.crmname && !!errors.crmname}
+                    disabled={!isEditing} // Disable in non-editing mode
                   >
                     {CrmDetails.map((crm) => (
                       <MenuItem key={crm.id} value={crm.crmname}>
@@ -202,46 +209,69 @@ const TicketDetails = () => {
             {/* Edit/Save/Cancel Buttons */}
             <Box display="flex" justifyContent="flex-end" mt="24px" sx={{gap:"10px"}}>
 
-            <Button
-                type="button"
-                variant="contained"
 
-                sx={{
-                  padding: "12px 24px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  borderRadius: "8px",
-                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                  transition: "0.3s",
-                  backgroundColor: colors.redAccent[500],
-                  color: "#ffffff",
-                  textTransform: "none",
-                  "&:hover": { backgroundColor: colors.redAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
-                }}
-              >
-                Delete
-              </Button>
-
-              <Button
-                type="button"
-                variant="contained"
-
-                sx={{
-                  padding: "12px 24px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  borderRadius: "8px",
-                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                  transition: "0.3s",
-                  backgroundColor: colors.blueAccent[700],
-                  color: "#ffffff",
-                  textTransform: "none",
-                  "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
-                }}
-              >
-                Save
-              </Button>
-
+              {!isEditing ? (
+                <Button
+                  type="button"
+                  variant="contained"
+                  onClick={() => setIsEditing(true)} // Enable editing mode
+                  sx={{
+                    padding: "12px 24px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    borderRadius: "8px",
+                    boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                    transition: "0.3s",
+                    backgroundColor: colors.blueAccent[700],
+                    color: "#ffffff",
+                    textTransform: "none",
+                    "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                  }}
+                >
+                  Edit
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                      transition: "0.3s",
+                      backgroundColor: colors.blueAccent[700],
+                      color: "#ffffff",
+                      textTransform: "none",
+                      "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="contained"
+                    onClick={handleCancel} // Cancel editing mode
+                    sx={{
+                      padding: "12px 24px",
+                      marginLeft: "5px",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                      transition: "0.3s",
+                      backgroundColor: colors.redAccent[600],
+                      color: "#ffffff",
+                      textTransform: "none",
+                      "&:hover": { backgroundColor: colors.redAccent[700], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
 
             </Box>
           </form>

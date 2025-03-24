@@ -113,7 +113,7 @@ const Topbar = () => {
         return "Customer Manager Details";
       case "/organizationdetails":
           return " Organization Details";
-      case "/ticketsdetails":
+      case "/ticketdetails":
           return " Experience Details";
       case "/form":
         return "Create a New Organization";

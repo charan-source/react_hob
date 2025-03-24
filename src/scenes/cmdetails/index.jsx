@@ -359,7 +359,7 @@ const CmDetails = () => {
 
               {/* Customer Manager Dropdown */}
               <FormControl fullWidth sx={{ gridColumn: "span 1", ...textFieldStyles }}>
-                <InputLabel>Customer Manager</InputLabel>
+                <InputLabel>  Select Customer Relationship Manager</InputLabel>
                 <Select
                   name="customerManager"
                   value={values.customerManager}

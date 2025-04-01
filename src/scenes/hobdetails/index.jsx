@@ -27,7 +27,7 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
   };
 }
 
-const CmDetails = () => {
+const HobDetails = () => {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(max-width:600px)");
   const colors = tokens(theme.palette.mode);
@@ -35,17 +35,14 @@ const CmDetails = () => {
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [profileImage, setProfileImage] = useState(null);
-  const [originalImage, setOriginalImage] = useState(null);
-  const [cropModalOpen, setCropModalOpen] = useState(false);
-  const [crop, setCrop] = useState();
-  const [completedCrop, setCompletedCrop] = useState();
-  const imgRef = useRef(null);
-  const fileInputRef = useRef(null);
+    const [profileImage, setProfileImage] = useState(null);
+    const [originalImage, setOriginalImage] = useState(null);
+    const [cropModalOpen, setCropModalOpen] = useState(false);
+    const [crop, setCrop] = useState();
+    const [completedCrop, setCompletedCrop] = useState();
+    const imgRef = useRef(null);
+    const fileInputRef = useRef(null);
   const location = useLocation();
-
-  const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
-
 
   const handleFormSubmit = (values) => {
     const formData = {
@@ -56,6 +53,7 @@ const CmDetails = () => {
     console.log("Form Data:", { ...values, fullPhoneNumber });
     setIsEditing(false);
     console.log("Form Data:", formData);
+
   };
 
   const handleImageUpload = (event) => {
@@ -134,6 +132,7 @@ const CmDetails = () => {
     await handleCropImage();
     setCropModalOpen(false);
   };
+  const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
 
   useEffect(() => {
     if (ticket.country) {
@@ -150,12 +149,14 @@ const CmDetails = () => {
     }
   }, [ticket, selectedCountry, selectedState]);
 
+
+
   const handleCancel = () => {
     setIsEditing(false);
   };
 
   const initialValues = {
-    firstName: ticket.name?.split(' ')[0] || "",
+    name: ticket.name?.split(' ')[0] || "",
     middleName: ticket.name?.split(' ')[1] || "",
     lastName: ticket.name?.split(' ')[2] || "",
     street: "",
@@ -165,16 +166,15 @@ const CmDetails = () => {
     email: ticket.email || "",
     PhoneNo: ticket.phoneno || "",
     phoneCode: ticket.phonenocode || "",
-    customerManager: ticket.customermanager || "",
+    address: ticket.address || "",
     organization: ticket.organization || "",
-    gender: ticket.gender || "",
   };
 
   const checkoutSchema = yup.object().shape({
-    firstName: yup.string().required("Required"),
+    name: yup.string().required("Required"),
     middleName: yup.string(),
-    lastName: yup.string().required(""),
-    street: yup.string().required(""),
+    lastName: yup.string().required("Required"),
+    street: yup.string().required("Required"),
     city: yup.string().required("Required"),
     state: yup.string().required("Required"),
     country: yup.string().required("Required"),
@@ -185,11 +185,11 @@ const CmDetails = () => {
       .min(10, "Must be at least 10 digits")
       .required("Required"),
     phoneCode: yup.string().required("Required"),
-    customerManager: yup.string().required("Required"),
+    address: yup.string().required("Required"),
     organization: yup.string().required("Required"),
-    gender: yup.string().required("Required"),
   });
 
+  // Styles for editable fields
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "8px",
@@ -207,53 +207,36 @@ const CmDetails = () => {
       },
     },
     "& .MuiInputLabel-root": {
-      fontSize: "16px",
       color: "#555",
+      fontSize: "16px",
     },
   };
 
-  const disabledTextFieldStyles = {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: "8px",
-      backgroundColor: "#f5f5f5",
-      fontSize: "16px",
-      padding: "8px 12px",
-      height: "50px",
-      "& .MuiOutlinedInput-notchedOutline": {
-        borderColor: "#e0e0e0",
-      },
-      "& .Mui-disabled": {
-        color: "#555",
-        WebkitTextFillColor: "#555",
-      },
-    },
-    "& .MuiInputLabel-root": {
-      fontSize: "16px",
-      color: "#999",
-    },
-  };
+  // Styles for disabled fields (view mode)
+  // const disabledFieldStyles = {
+  //   padding: "12px",
+  //   backgroundColor: "#f5f5f5",
+  //   borderRadius: "8px",
+  //   minHeight: "50px",
+  //   display: "flex",
+  //   alignItems: "center",
+  //   fontSize: "16px",
+  //   color: "#000",
+  //   boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+  //   border: "1px solid transparent",
+  // };
 
   const countries = Country.getAllCountries();
   const states = selectedCountry ? State.getStatesOfCountry(selectedCountry.isoCode) : [];
   const cities = selectedState ? City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode) : [];
 
-  const customerManagers = [
-    "Rambabu",
-    "Charan",
-    "Lakshman",
-    "Satya dev",
-    "Ram",
-  ];
+  const getPhoneCodeDisplay = (phoneCode) => {
+    if (!phoneCode) return "-";
+    const country = countries.find(c => `+${c.phonecode}` === phoneCode);
+    return country ? `+${country.phonecode} (${country.name})` : phoneCode;
+  };
 
-  const organization = [
-    "Wipro",
-    "Infosys",
-    "TCS",
-    "HCL",
-    "Tech Mahindra",
-  ];
-
-  const gender = ["Male", "Female"];
+  // Helper function to render fields in both modes
 
   const renderField = (heading, name, value, fieldComponent, gridSpan = 1) => (
     <Box sx={{ gridColumn: `span ${gridSpan}` }}>
@@ -263,7 +246,7 @@ const CmDetails = () => {
       {isEditing ? (
         fieldComponent
       ) : (
-        <Typography variant="body1" sx={{
+        <Typography variant="body1" sx={{ 
           padding: "12px",
           backgroundColor: "#f5f5f5",
           borderRadius: "4px",
@@ -277,89 +260,84 @@ const CmDetails = () => {
     </Box>
   );
 
-  const getPhoneCodeDisplay = (phoneCode) => {
-    if (!phoneCode) return "-";
-    const country = countries.find(c => `+${c.phonecode}` === phoneCode);
-    return country ? `+${country.phonecode} (${country.name})` : phoneCode;
-  };
+  const gender = ["Male", "Female"];
 
   return (
     <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
       <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
         {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
           <form onSubmit={handleSubmit}>
-
-            <Box display="flex" justifyContent="center" mb="20px">
-              <Box sx={{ position: 'relative' }}>
-                <Avatar
-                  src={profileImage || "https://via.placeholder.com/150"}
-                  sx={{
-                    width: 120,
-                    height: 120,
-                    border: `2px solid ${colors.primary[500]}`,
-                    cursor: isEditing ? 'pointer' : 'default',
-                    opacity: isEditing ? 1 : 0.8
-                  }}
-                  onClick={triggerFileInput}
-                />
-                <IconButton
-                  sx={{
-                    position: 'absolute',
-                    bottom: 0,
-                    right: 0,
-                    backgroundColor: colors.blueAccent[500],
-                    '&:hover': {
-                      backgroundColor: isEditing ? colors.blueAccent[600] : colors.blueAccent[500],
-                    },
-                    opacity: isEditing ? 1 : 0.7
-                  }}
-                  onClick={triggerFileInput}
-                  disabled={!isEditing}
-                >
-                  <PhotoCamera />
-                </IconButton>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleImageUpload}
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  disabled={!isEditing}
-                />
-              </Box>
-            </Box>
-
-            {/* Crop Modal */}
-            <Dialog open={cropModalOpen} onClose={() => setCropModalOpen(false)} maxWidth="md">
-              <DialogTitle>Crop Profile Picture</DialogTitle>
-              <DialogContent>
-                {originalImage && (
-                  <ReactCrop
-                    crop={crop}
-                    onChange={(c) => setCrop(c)}
-                    onComplete={handleCropComplete}
-                    aspect={1}
-                    circularCrop
-                  >
-                    <img
-                      ref={imgRef}
-                      src={originalImage}
-                      onLoad={onImageLoad}
-                      style={{ maxHeight: '70vh', maxWidth: '100%' }}
-                      alt="Crop preview"
-                    />
-                  </ReactCrop>
-                )}
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setCropModalOpen(false)} color="primary">
-                  Cancel
-                </Button>
-                <Button onClick={handleSaveCroppedImage} color="primary" variant="contained">
-                  Save
-                </Button>
-              </DialogActions>
-            </Dialog>
+             <Box display="flex" justifyContent="center" mb="20px">
+                          <Box sx={{ position: 'relative' }}>
+                            <Avatar
+                              src={profileImage || "https://via.placeholder.com/150"}
+                              sx={{
+                                width: 120,
+                                height: 120,
+                                border: `2px solid ${colors.primary[500]}`,
+                                cursor: isEditing ? 'pointer' : 'default',
+                                opacity: isEditing ? 1 : 0.8
+                              }}
+                              onClick={triggerFileInput}
+                            />
+                            <IconButton
+                              sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                right: 0,
+                                backgroundColor: colors.blueAccent[500],
+                                '&:hover': {
+                                  backgroundColor: isEditing ? colors.blueAccent[600] : colors.blueAccent[500],
+                                },
+                                opacity: isEditing ? 1 : 0.7
+                              }}
+                              onClick={triggerFileInput}
+                              disabled={!isEditing}
+                            >
+                              <PhotoCamera />
+                            </IconButton>
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              onChange={handleImageUpload}
+                              accept="image/*"
+                              style={{ display: 'none' }}
+                              disabled={!isEditing}
+                            />
+                          </Box>
+                        </Box>
+            
+                        {/* Crop Modal */}
+                        <Dialog open={cropModalOpen} onClose={() => setCropModalOpen(false)} maxWidth="md">
+                          <DialogTitle>Crop Profile Picture</DialogTitle>
+                          <DialogContent>
+                            {originalImage && (
+                              <ReactCrop
+                                crop={crop}
+                                onChange={(c) => setCrop(c)}
+                                onComplete={handleCropComplete}
+                                aspect={1}
+                                circularCrop
+                              >
+                                <img
+                                  ref={imgRef}
+                                  src={originalImage}
+                                  onLoad={onImageLoad}
+                                  style={{ maxHeight: '70vh', maxWidth: '100%' }}
+                                  alt="Crop preview"
+                                />
+                              </ReactCrop>
+                            )}
+                          </DialogContent>
+                          <DialogActions>
+                            <Button onClick={() => setCropModalOpen(false)} color="primary">
+                              Cancel
+                            </Button>
+                            <Button onClick={handleSaveCroppedImage} color="primary" variant="contained">
+                              Save
+                            </Button>
+                          </DialogActions>
+                        </Dialog>
             <Box
               display="grid"
               gap="20px"
@@ -368,18 +346,18 @@ const CmDetails = () => {
               {/* First Name */}
               {renderField(
                 "First Name",
-                "firstName",
-                values.firstName,
+                "name",
+                values.name,
                 <TextField
                   fullWidth
                   variant="outlined"
                   type="text"
-                  name="firstName"
-                  value={values.firstName}
+                  name="name"
+                  value={values.name}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={!!touched.firstName && !!errors.firstName}
-                  helperText={touched.firstName && errors.firstName}
+                  error={!!touched.name && !!errors.name}
+                  helperText={touched.name && errors.name}
                   sx={textFieldStyles}
                 />
               )}
@@ -422,7 +400,7 @@ const CmDetails = () => {
                 />
               )}
 
-              {/* Email Id */}
+              {/* Email */}
               {renderField(
                 "Email Id",
                 "email",
@@ -441,6 +419,7 @@ const CmDetails = () => {
                 />
               )}
 
+
               {/* Phone Number */}
               {renderField(
                 "Phone Number",
@@ -458,59 +437,56 @@ const CmDetails = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        sx={isEditing ? textFieldStyles : disabledTextFieldStyles}
+                        // label="Phone Code"
+                        sx={textFieldStyles}
                         error={!!touched.phoneCode && !!errors.phoneCode}
                         helperText={touched.phoneCode && errors.phoneCode}
-                        disabled={!isEditing}
                       />
                     )}
-                    disabled={!isEditing}
                   />
                   <TextField
                     fullWidth
                     variant="outlined"
                     type="text"
+                    // label="Phone No"
                     name="PhoneNo"
                     value={values.PhoneNo}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={!!touched.PhoneNo && !!errors.PhoneNo}
                     helperText={touched.PhoneNo && errors.PhoneNo}
-                    sx={isEditing ? textFieldStyles : disabledTextFieldStyles}
-                    disabled={!isEditing}
+                    sx={textFieldStyles}
                   />
                 </Box>,
                 1
               )}
-
-              {/* Gender */}
-              {renderField(
-                "Gender",
-                "gender",
-                values.gender,
-                <Autocomplete
-                  fullWidth
-                  options={gender}
-                  value={values.gender || null}
-                  onChange={(event, newValue) => {
-                    setFieldValue("gender", newValue || "");
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      sx={isEditing ? textFieldStyles : disabledTextFieldStyles}
-                      error={!!touched.gender && !!errors.gender}
-                      helperText={touched.gender && errors.gender}
-                      disabled={!isEditing}
-                    />
-                  )}
-                  disabled={!isEditing}
-                  sx={{ gridColumn: "span 1" }}
-                  freeSolo
-                  forcePopupIcon
-                  popupIcon={<ArrowDropDownIcon />}
-                />
-              )}
+                      {renderField(
+                              "Gender",
+                              "gender",
+                              values.gender,
+                              <Autocomplete
+                                fullWidth
+                                options={gender}
+                                value={values.gender || null}
+                                onChange={(event, newValue) => {
+                                  setFieldValue("gender", newValue || "");
+                                }}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    sx={textFieldStyles }
+                                    error={!!touched.gender && !!errors.gender}
+                                    helperText={touched.gender && errors.gender}
+                                    disabled={!isEditing}
+                                  />
+                                )}
+                                disabled={!isEditing}
+                                sx={{ gridColumn: "span 1" }}
+                                freeSolo
+                                forcePopupIcon
+                                popupIcon={<ArrowDropDownIcon />}
+                              />
+                            )}
 
               {/* Country */}
               {renderField(
@@ -531,13 +507,12 @@ const CmDetails = () => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      sx={isEditing ? textFieldStyles : disabledTextFieldStyles}
+                      // label="Country"
+                      sx={textFieldStyles}
                       error={!!touched.country && !!errors.country}
                       helperText={touched.country && errors.country}
-                      disabled={!isEditing}
                     />
                   )}
-                  disabled={!isEditing}
                 />
               )}
 
@@ -559,13 +534,14 @@ const CmDetails = () => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      sx={isEditing ? textFieldStyles : disabledTextFieldStyles}
+                      // label="State"
+                      sx={textFieldStyles}
                       error={!!touched.state && !!errors.state}
                       helperText={touched.state && errors.state}
-                      disabled={!selectedCountry || !isEditing}
+                      disabled={!selectedCountry}
                     />
                   )}
-                  disabled={!selectedCountry || !isEditing}
+                  disabled={!selectedCountry}
                 />
               )}
 
@@ -586,90 +562,33 @@ const CmDetails = () => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      sx={isEditing ? textFieldStyles : disabledTextFieldStyles}
+                      // label="City"
+                      sx={textFieldStyles}
                       error={!!touched.city && !!errors.city}
                       helperText={touched.city && errors.city}
-                      disabled={!selectedState || !isEditing}
+                      disabled={!selectedState}
                     />
                   )}
-                  disabled={!selectedState || !isEditing}
+                  disabled={!selectedState}
                 />
               )}
 
-              {/* Street Address */}
+              {/* Address */}
               {renderField(
-                "Street Address",
-                "street",
-                values.street,
+                "Address",
+                "address",
+                values.address,
                 <TextField
                   fullWidth
                   variant="outlined"
                   type="text"
-                  name="street"
-                  value={values.street}
+                  name="address"
+                  value={values.address}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={!!touched.street && !!errors.street}
-                  helperText={touched.street && errors.street}
-                  sx={isEditing ? textFieldStyles : disabledTextFieldStyles}
-                  disabled={!isEditing}
-                />
-              )}
-
-              {/* Organization */}
-              {renderField(
-                "Organization",
-                "organization",
-                values.organization,
-                <Autocomplete
-                  fullWidth
-                  options={organization}
-                  value={values.organization || null}
-                  onChange={(event, newValue) => {
-                    setFieldValue("gender", newValue || "");
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      sx={isEditing ? textFieldStyles : disabledTextFieldStyles}
-                      error={!!touched.organization && !!errors.organization}
-                      helperText={touched.organization && errors.organization}
-                      disabled={!isEditing}
-                    />
-                  )}
-                  disabled={!isEditing}
-                  sx={{ gridColumn: "span 1" }}
-                  freeSolo
-                  forcePopupIcon
-                  popupIcon={<ArrowDropDownIcon />}
-                />
-              )}
-
-            {renderField(
-                "Customer Ralationship Manager",
-                "customerManager",
-                values.customerManager,
-                <Autocomplete
-                  fullWidth
-                  options={customerManagers}
-                  value={values.customerManager || null}
-                  onChange={(event, newValue) => {
-                    setFieldValue("gender", newValue || "");
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      sx={isEditing ? textFieldStyles : disabledTextFieldStyles}
-                      error={!!touched.customerManager && !!errors.customerManager}
-                      helperText={touched.customerManager && errors.customerManager}
-                      disabled={!isEditing}
-                    />
-                  )}
-                  disabled={!isEditing}
-                  sx={{ gridColumn: "span 1" }}
-                  freeSolo
-                  forcePopupIcon
-                  popupIcon={<ArrowDropDownIcon />}
+                  error={!!touched.address && !!errors.address}
+                  helperText={touched.address && errors.address}
+                  sx={textFieldStyles}
                 />
               )}
             </Box>
@@ -721,7 +640,7 @@ const CmDetails = () => {
                     onClick={handleCancel}
                     sx={{
                       padding: "12px 24px",
-                      marginLeft: "5px",
+                      marginLeft: "10px",
                       fontSize: "14px",
                       fontWeight: "bold",
                       borderRadius: "8px",
@@ -745,4 +664,4 @@ const CmDetails = () => {
   );
 };
 
-export default CmDetails;
+export default HobDetails;

@@ -119,7 +119,7 @@ const PendingExperiences = () => {
 
 
   return (
-    <Box m="20px">
+    <Box m="10px">
       {/* Toolbar */}
       <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={2} flexDirection={isMobile ? "column" : "row"}>
         {/* Search Bar */}
@@ -302,6 +302,9 @@ const PendingExperiences = () => {
             },
             "& .MuiDataGrid-root": {
               // scrollbarWidth: "none !important", // Hides scrollbar in Firefox
+              "&:hover": {
+                cursor: "pointer",
+              },
             },
             "& .MuiDataGrid-virtualScroller": {
               // scrollbarWidth: "none !important",

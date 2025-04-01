@@ -117,7 +117,7 @@ const AllExperiences = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box m="10px">
       {/* Toolbar */}
       <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={2} flexDirection={isMobile ? "column" : "row"}>
         {/* Search Bar */}
@@ -307,6 +307,9 @@ const AllExperiences = () => {
             },
             "& .MuiDataGrid-row": {
               borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
+              "&:hover": {
+                cursor: "pointer",
+              },
             },
             "& .MuiTablePagination-root": {
               color: "#ffffff !important", // Ensure pagination text is white

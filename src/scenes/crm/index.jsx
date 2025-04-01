@@ -74,7 +74,7 @@ const Crm = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box  m="10px">
       {/* Toolbar */}
       <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={2} flexDirection={isMobile ? "column" : "row"}>
         {/* Search Bar */}
@@ -103,7 +103,7 @@ const Crm = () => {
 
       {/* DataGrid */}
       <Box height="70vh"
-        m="13px 0 0 0"
+         m="13px 0 0 0"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
@@ -137,6 +137,9 @@ const Crm = () => {
           },
           "& .MuiDataGrid-row": {
             borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
+            "&:hover": {
+              cursor: "pointer",
+            },
           },
           "& .MuiTablePagination-root": {
             color: "#ffffff !important", // Ensure pagination text is white
@@ -195,6 +198,9 @@ const Crm = () => {
           },
           "& .MuiDataGrid-root": {
             // scrollbarWidth: "none !important", // Hides scrollbar in Firefox
+            "&:hover": {
+              cursor: "pointer",
+            },
           },
           "& .MuiDataGrid-virtualScroller": {
             // scrollbarWidth: "none !important",

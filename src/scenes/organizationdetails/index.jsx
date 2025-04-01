@@ -1,4 +1,4 @@
-import { Box, Button, TextField, useMediaQuery, useTheme, Autocomplete } from "@mui/material";
+import { Box, Button, TextField, useMediaQuery, useTheme, Autocomplete, Typography } from "@mui/material";
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -9,15 +9,16 @@ import { useLocation } from 'react-router-dom';
 const OrganizationDetails = () => {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(max-width:600px)");
-  const colors = tokens(theme.palette.mode); // Get theme colors
+  // const isMobile = useMediaQuery("(max-width:600px)");
+  const colors = tokens(theme.palette.mode);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [orgManagerPairs, setOrgManagerPairs] = useState([{ branch: "" }]);
   const location = useLocation();
   const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
 
-  // Initialize selectedCountry, selectedState, and selectedCity based on ticket data
   useEffect(() => {
     if (ticket.country) {
       const country = Country.getAllCountries().find((c) => c.name === ticket.country);
@@ -34,14 +35,13 @@ const OrganizationDetails = () => {
   }, [ticket, selectedCountry, selectedState]);
 
   const handleFormSubmit = (values) => {
-    // Combine phone code and phone number
     const fullPhoneNumber = `${values.phoneCode}${values.PhoneNo}`;
     console.log("Form Data:", { ...values, fullPhoneNumber });
-    setIsEditing(false); // Exit editing mode after saving
+    setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setIsEditing(false); // Exit editing mode without saving
+    setIsEditing(false);
   };
 
   const initialValues = {
@@ -55,8 +55,8 @@ const OrganizationDetails = () => {
     email: ticket.email || "",
     PhoneNo: ticket.phoneno || "",
     phoneCode: ticket.phonenocode || "",
-    address: ticket.address || "", // New field for customer manager
-    organization: ticket.organization || "", // New field for organization
+    address: ticket.address || "",
+    organization: ticket.organization || "",
   };
 
   const checkoutSchema = yup.object().shape({
@@ -75,9 +75,10 @@ const OrganizationDetails = () => {
       .required("Required"),
     phoneCode: yup.string().required("Required"),
     address: yup.string().required("Required"),
-    organization: yup.string().required("Required"), // Add organization validation
+    organization: yup.string().required("Required"),
   });
 
+  // Styles for editable fields
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "8px",
@@ -90,39 +91,75 @@ const OrganizationDetails = () => {
       },
       padding: "8px 12px",
       height: "50px",
-      "&.Mui-disabled": {
-        // Override disabled styles
-        backgroundColor: "#ffffff !important",
-        color: "inherit !important",
-        boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1) !important",
-        "& .MuiOutlinedInput-notchedOutline": {
-          borderColor: "#ccc !important",
-        },
+      "& .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#ccc",
       },
     },
     "& .MuiInputLabel-root": {
       color: "#555",
       fontSize: "16px",
-      "&.Mui-disabled": {
-        color: "#555 !important", // Keep label color same when disabled
-      },
-    },
-    "& .MuiOutlinedInput-notchedOutline": {
-      border: "1px solid #ccc",
     },
   };
 
+  // Styles for disabled fields (view mode)
+  // const disabledFieldStyles = {
+  //   padding: "12px",
+  //   backgroundColor: "#f5f5f5",
+  //   borderRadius: "8px",
+  //   minHeight: "50px",
+  //   display: "flex",
+  //   alignItems: "center",
+  //   fontSize: "16px",
+  //   color: "#000",
+  //   boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+  //   border: "1px solid transparent",
+  // };
 
 
+  const addOrgManagerPair = () => {
+    setOrgManagerPairs([...orgManagerPairs, { branch: "" }]);
+  };
 
-  // Get all countries
+  const removeOrgManagerPair = (index) => {
+    if (orgManagerPairs.length > 1) {
+      const updatedPairs = [...orgManagerPairs];
+      updatedPairs.splice(index, 1);
+      setOrgManagerPairs(updatedPairs);
+    }
+  };
+
   const countries = Country.getAllCountries();
-
-  // Get states based on selected country
   const states = selectedCountry ? State.getStatesOfCountry(selectedCountry.isoCode) : [];
-
-  // Get cities based on selected state
   const cities = selectedState ? City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode) : [];
+
+  const getPhoneCodeDisplay = (phoneCode) => {
+    if (!phoneCode) return "-";
+    const country = countries.find(c => `+${c.phonecode}` === phoneCode);
+    return country ? `+${country.phonecode} (${country.name})` : phoneCode;
+  };
+
+  const renderField = (heading, name, value, fieldComponent, gridSpan = 1) => (
+    <Box sx={{ gridColumn: `span ${gridSpan}` }}>
+      <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", color: "#555" }}>
+        {heading}
+      </Typography>
+      {isEditing ? (
+        fieldComponent
+      ) : (
+        <Typography variant="body1" sx={{
+          padding: "12px",
+          backgroundColor: "#f5f5f5",
+          borderRadius: "4px",
+          minHeight: "50px",
+          display: "flex",
+          alignItems: "center"
+        }}>
+          {value || "-"}
+        </Typography>
+      )}
+    </Box>
+  );
+
 
   return (
     <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
@@ -135,237 +172,300 @@ const OrganizationDetails = () => {
               gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
             >
               {/* Organization Name */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                type="text"
-                label="Organization Name"
-                name="organization"
-                value={values.organization}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={!!touched.organization && !!errors.organization}
-                helperText={touched.organization && errors.organization}
-                sx={{
-                  ...textFieldStyles,
-                  "& .MuiInputBase-input.Mui-disabled": {
-                    WebkitTextFillColor: "#000", // Keep text color black when disabled
-                  },
-                   gridColumn: "span 1"
-                }}
-                disabled={!isEditing} // Disable in non-editing mode
-              />
-
-              {/* Founder Name */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                type="text"
-                label="Founder Name"
-                name="name"
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={!!touched.name && !!errors.name}
-                helperText={touched.name && errors.name}
-                sx={{
-                  ...textFieldStyles,
-                  "& .MuiInputBase-input.Mui-disabled": {
-                    WebkitTextFillColor: "#000", // Keep text color black when disabled
-                  },
-                   gridColumn: "span 1"
-                }}
-                disabled={!isEditing} // Disable in non-editing mode
-              />
-
-              {/* Email Id */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                type="email"
-                label="Email Id"
-                name="email"
-                value={values.email}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={!!touched.email && !!errors.email}
-                helperText={touched.email && errors.email}
-                sx={{
-                  ...textFieldStyles,
-                  "& .MuiInputBase-input.Mui-disabled": {
-                    WebkitTextFillColor: "#000", // Keep text color black when disabled
-                  },
-                   gridColumn: "span 1"
-                }}
-                disabled={!isEditing} // Disable in non-editing mode
-              />
-
-              {/* Address */}
-              <TextField
-                fullWidth
-                variant="outlined"
-                type="text"
-                label="Address"
-                name="address"
-                value={values.address}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={!!touched.address && !!errors.address}
-                helperText={touched.address && errors.address}
-                sx={{
-                  ...textFieldStyles,
-                  "& .MuiInputBase-input.Mui-disabled": {
-                    WebkitTextFillColor: "#000", // Keep text color black when disabled
-                  },
-                   gridColumn: "span 1"
-                }}
-                disabled={!isEditing} // Disable in non-editing mode
-              />
-
-              {/* Phone Code and Phone Number (Combined as one span) */}
-              <Box sx={{ gridColumn: "span 1", display: "flex", gap: "10px" }}>
-                <Autocomplete
-                  fullWidth
-                  options={countries}
-                  sx={{
-                    ...textFieldStyles,
-                    "& .MuiInputBase-input.Mui-disabled": {
-                      WebkitTextFillColor: "#000",
-                    },
-           
-                  }}
-                  getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
-                  value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
-                  onChange={(event, newValue) => {
-                    setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Phone Code"
-                      sx={textFieldStyles}
-                      error={!!touched.phoneCode && !!errors.phoneCode}
-                      helperText={touched.phoneCode && errors.phoneCode}
-                      disabled={!isEditing} // Disable in non-editing mode
-                    />
-                  )}
-                  disabled={!isEditing} // Disable in non-editing mode
-                />
+              {renderField(
+                "Organization Name",
+                "organization",
+                values.organization,
                 <TextField
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Phone No"
-                  name="PhoneNo"
-                  value={values.PhoneNo}
+                  name="organization"
+                  value={values.organization}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={!!touched.PhoneNo && !!errors.PhoneNo}
-                  helperText={touched.PhoneNo && errors.PhoneNo}
-                  sx={{
-                    ...textFieldStyles,
-                    "& .MuiInputBase-input.Mui-disabled": {
-                      WebkitTextFillColor: "#000", // Keep text color black when disabled
-                    },
-                     gridColumn: "span 1"
-                  }}
-                  disabled={!isEditing} // Disable in non-editing mode
+                  error={!!touched.organization && !!errors.organization}
+                  helperText={touched.organization && errors.organization}
+                  sx={textFieldStyles}
                 />
+              )}
+
+              {/* Founder Name */}
+              {renderField(
+                "Founder Name",
+                "name",
+                values.name,
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  type="text"
+                  name="name"
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.name && !!errors.name}
+                  helperText={touched.name && errors.name}
+                  sx={textFieldStyles}
+                />
+              )}
+
+              {/* Email */}
+              {renderField(
+                "Email Id",
+                "email",
+                values.email,
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  type="email"
+                  name="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.email && !!errors.email}
+                  helperText={touched.email && errors.email}
+                  sx={textFieldStyles}
+                />
+              )}
+
+              {/* Address */}
+              {renderField(
+                "Address",
+                "address",
+                values.address,
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  type="text"
+                  name="address"
+                  value={values.address}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.address && !!errors.address}
+                  helperText={touched.address && errors.address}
+                  sx={textFieldStyles}
+                />
+              )}
+
+              {/* Phone Number */}
+              {renderField(
+                "Phone Number",
+                "PhoneNo",
+                values.PhoneNo ? `${getPhoneCodeDisplay(values.phoneCode)} ${values.PhoneNo}` : "-",
+                <Box sx={{ display: "flex", gap: "10px" }}>
+                  <Autocomplete
+                    fullWidth
+                    options={countries}
+                    getOptionLabel={(option) => `+${option.phonecode} (${option.name})`}
+                    value={countries.find((country) => `+${country.phonecode}` === values.phoneCode) || null}
+                    onChange={(event, newValue) => {
+                      setFieldValue("phoneCode", newValue ? `+${newValue.phonecode}` : "");
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        // label="Phone Code"
+                        sx={textFieldStyles}
+                        error={!!touched.phoneCode && !!errors.phoneCode}
+                        helperText={touched.phoneCode && errors.phoneCode}
+                      />
+                    )}
+                  />
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    type="text"
+                    // label="Phone No"
+                    name="PhoneNo"
+                    value={values.PhoneNo}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={!!touched.PhoneNo && !!errors.PhoneNo}
+                    helperText={touched.PhoneNo && errors.PhoneNo}
+                    sx={textFieldStyles}
+                  />
+                </Box>,
+                1
+              )}
+
+              {/* Country */}
+              {renderField(
+                "Country",
+                "country",
+                values.country,
+                <Autocomplete
+                  fullWidth
+                  options={countries}
+                  getOptionLabel={(option) => option.name}
+                  value={selectedCountry}
+                  onChange={(event, newValue) => {
+                    setSelectedCountry(newValue);
+                    setSelectedState(null);
+                    setSelectedCity(null);
+                    setFieldValue("country", newValue ? newValue.name : "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      // label="Country"
+                      sx={textFieldStyles}
+                      error={!!touched.country && !!errors.country}
+                      helperText={touched.country && errors.country}
+                    />
+                  )}
+                />
+              )}
+
+              {/* State */}
+              {renderField(
+                "State",
+                "state",
+                values.state,
+                <Autocomplete
+                  fullWidth
+                  options={states}
+                  getOptionLabel={(option) => option.name}
+                  value={selectedState}
+                  onChange={(event, newValue) => {
+                    setSelectedState(newValue);
+                    setSelectedCity(null);
+                    setFieldValue("state", newValue ? newValue.name : "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      // label="State"
+                      sx={textFieldStyles}
+                      error={!!touched.state && !!errors.state}
+                      helperText={touched.state && errors.state}
+                      disabled={!selectedCountry}
+                    />
+                  )}
+                  disabled={!selectedCountry}
+                />
+              )}
+
+              {/* City */}
+              {renderField(
+                "City",
+                "city",
+                values.city,
+                <Autocomplete
+                  fullWidth
+                  options={cities}
+                  getOptionLabel={(option) => option.name}
+                  value={selectedCity}
+                  onChange={(event, newValue) => {
+                    setSelectedCity(newValue);
+                    setFieldValue("city", newValue ? newValue.name : "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      // label="City"
+                      sx={textFieldStyles}
+                      error={!!touched.city && !!errors.city}
+                      helperText={touched.city && errors.city}
+                      disabled={!selectedState}
+                    />
+                  )}
+                  disabled={!selectedState}
+                />
+              )}
+
+              <Box sx={{ gridColumn: "span 1", display: "flex", gap: "10px", alignItems: "center" }}></Box>
+
+              {/* Branch Fields - Single Column Layout */}
+              {/* Branch Fields - Single Column Layout */}
+              {/* Branch Fields - Single Column Layout */}
+              {/* Branch Fields - Single Column Layout */}
+              {/* Branch Fields - Full Width Container */}
+              <Box sx={{
+                gridColumn: "1 / -1",
+                display: "grid",
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                gap: "20px"
+              }}>
+                {orgManagerPairs.map((pair, index) => (
+                  <Box key={`pair-${index}`} sx={{
+                    gridColumn: "span 1",
+                    display: "flex",
+                    flexDirection: isNonMobile ? "column" : "row",
+                    alignItems: isNonMobile ? "flex-start" : "center",
+                    gap: isNonMobile ? "10px" : "0px"
+                  }}>
+                    {/* Input field */}
+                    <Box sx={{ flex: 1, width: "100%" }}>
+                      <Typography variant="subtitle1" sx={{ mb: 1, color: "#555" }}>
+                        {index === 0 ? "Branch" : `Branch ${index + 1}`}
+                      </Typography>
+                      {isEditing ? (
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          type="text"
+                          name={`branch${index}`}
+                          value={values[`branch${index}`] || ''}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={!!touched[`branch${index}`] && !!errors[`branch${index}`]}
+                          helperText={touched[`branch${index}`] && errors[`branch${index}`]}
+                          sx={textFieldStyles}
+                        />
+                      ) : (
+                        <Box sx={{
+                          padding: "12px",
+                          backgroundColor: "#f5f5f5",
+                          borderRadius: "4px",
+                          minHeight: "50px",
+                          display: "flex",
+                          alignItems: "center"
+                        }}>
+                          {values[`branch${index}`] || "-"}
+                        </Box>
+                      )}
+                    </Box>
+
+                    {/* Buttons - responsive positioning */}
+                    {isEditing && (
+                      <Box sx={{
+                        ml: isNonMobile ? 0 : 2,
+                        // mt: isNonMobile ? 1 : 0,
+                        marginTop:"30px",
+                        alignSelf: isNonMobile ? "flex-start" : "center"
+                      }}>
+                        {index === orgManagerPairs.length - 1 ? (
+                          <Button
+                            variant="outlined"
+                            onClick={addOrgManagerPair}
+                            sx={{
+                              minWidth: '100px',
+                              height: '40px',
+                              backgroundColor: colors.blueAccent[700],
+                              color: "#ffffff"
+                            }}
+                          >
+                            Add More
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outlined"
+                            onClick={() => removeOrgManagerPair(index)}
+                            sx={{
+                              minWidth: '100px',
+                              height: '40px',
+                              backgroundColor: '#ffebee'
+                            }}
+                            color="error"
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </Box>
+                    )}
+                  </Box>
+                ))}
               </Box>
-
-              {/* Country Dropdown */}
-              <Autocomplete
-                fullWidth
-                options={countries}
-                getOptionLabel={(option) => option.name}
-                value={selectedCountry}
-                onChange={(event, newValue) => {
-                  setSelectedCountry(newValue);
-                  setSelectedState(null); // Reset state when country changes
-                  setSelectedCity(null); // Reset city when country changes
-                  setFieldValue("country", newValue ? newValue.name : "");
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Country"
-                    sx={textFieldStyles}
-                    error={!!touched.country && !!errors.country}
-                    helperText={touched.country && errors.country}
-                    disabled={!isEditing} // Disable in non-editing mode
-                  />
-                )}
-                sx={{
-                  ...textFieldStyles,
-                  "& .MuiInputBase-input.Mui-disabled": {
-                    WebkitTextFillColor: "#000",
-                  },
-                   gridColumn: "span 1"
-                }}
-                disabled={!isEditing} // Disable in non-editing mode
-              />
-
-              {/* State Dropdown */}
-              <Autocomplete
-                fullWidth
-                options={states}
-                getOptionLabel={(option) => option.name}
-                value={selectedState}
-                onChange={(event, newValue) => {
-                  setSelectedState(newValue);
-                  setSelectedCity(null); // Reset city when state changes
-                  setFieldValue("state", newValue ? newValue.name : "");
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="State"
-                    sx={textFieldStyles}
-                    error={!!touched.state && !!errors.state}
-                    helperText={touched.state && errors.state}
-                    disabled={!selectedCountry || !isEditing} // Disable in non-editing mode
-                  />
-                )}
-                sx={{
-                  ...textFieldStyles,
-                  "& .MuiInputBase-input.Mui-disabled": {
-                    WebkitTextFillColor: "#000",
-                  },
-                   gridColumn: "span 1"
-                }}
-                disabled={!selectedCountry || !isEditing} // Disable in non-editing mode
-              />
-
-              {/* City Dropdown */}
-              <Autocomplete
-                fullWidth
-                options={cities}
-                sx={{
-                  ...textFieldStyles,
-                  "& .MuiInputBase-input.Mui-disabled": {
-                    WebkitTextFillColor: "#000",
-                  },
-                   gridColumn: "span 1"
-                }}
-                getOptionLabel={(option) => option.name}
-                value={selectedCity}
-                onChange={(event, newValue) => {
-                  setSelectedCity(newValue);
-                  setFieldValue("city", newValue ? newValue.name : "");
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="City"
-                    sx={textFieldStyles}
-                    error={!!touched.city && !!errors.city}
-                    helperText={touched.city && errors.city}
-                    disabled={!selectedState || !isEditing} // Disable in non-editing mode
-                  />
-                )}
-       
-                disabled={!selectedState || !isEditing} // Disable in non-editing mode
-              />
             </Box>
 
             <Box display="flex" justifyContent="flex-end" mt="24px">
@@ -373,7 +473,7 @@ const OrganizationDetails = () => {
                 <Button
                   type="button"
                   variant="contained"
-                  onClick={() => setIsEditing(true)} // Enable editing mode
+                  onClick={() => setIsEditing(true)}
                   sx={{
                     padding: "12px 24px",
                     fontSize: "14px",
@@ -412,10 +512,10 @@ const OrganizationDetails = () => {
                   <Button
                     type="button"
                     variant="contained"
-                    onClick={handleCancel} // Cancel editing mode
+                    onClick={handleCancel}
                     sx={{
                       padding: "12px 24px",
-                      marginLeft:"5px",
+                      marginLeft: "10px",
                       fontSize: "14px",
                       fontWeight: "bold",
                       borderRadius: "8px",

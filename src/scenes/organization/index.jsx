@@ -38,9 +38,9 @@ const initialTickets = [
 // Columns for DataGrid
 const columns = [
   { field: "id", headerName: "ID", flex: 0.4, headerClassName: "bold-header", disableColumnMenu: false, minWidth: 100 },
-  { field: "name", headerName: "Name", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 200 },
+  { field: "organization", headerName: "Organization", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 200 },
   // { field: "city", headerName: "City", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 150 },
-  { field: "phone", headerName: "Phone", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 150 },
+  { field: "email", headerName: "Email", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 150 },
   { field: "city", headerName: "City", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 150 },
   // { field: "created", headerName: "Created", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 150 },
 ];
@@ -111,7 +111,7 @@ const Organization = () => {
   // const getUniqueValues = (key) => [...new Set(tickets.map((ticket) => ticket[key]))];
 
   return (
-    <Box m="20px">
+    <Box m="10px">
       {/* Toolbar */}
       <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={2} flexDirection={isMobile ? "column" : "row"}>
         {/* Search Bar */}
@@ -300,6 +300,9 @@ const Organization = () => {
             },
             "& .MuiDataGrid-row": {
               borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
+              "&:hover": {
+                cursor: "pointer",
+              },
             },
             "& .MuiTablePagination-root": {
               color: "#ffffff !important", // Ensure pagination text is white
@@ -323,6 +326,7 @@ const Organization = () => {
           columns={columns}
           pageSize={10}
           onRowClick={handleRowClick}
+          
         />
       </Box>
     </Box>

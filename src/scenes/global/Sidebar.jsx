@@ -7,23 +7,28 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import HandshakeOutlinedIcon from "@mui/icons-material/HandshakeOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
+// import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import { useNavigate } from "react-router-dom";
 import logoLight from "./logo.png";
 
 // Shared getActivePage function
 const getActivePage = (pathname) => {
-  if (pathname.includes("/crm") || pathname.includes("/crmform")) {
+  if (pathname.includes("/crm") || pathname.includes("/crmform") || pathname.includes("/crmdetails")) {
     return "/crm";
-  } else if (pathname.includes("/cm") || pathname.includes("/cmform")) {
+  } else if (pathname.includes("/cm") || pathname.includes("/cmform") || pathname.includes("/cmdetails")) {
     return "/cm";
-  } else if (pathname.includes("/organization") || pathname.includes("/form") || pathname.includes("/organizationdetails") ) {
-    return "/organization";
+  } else if (pathname.includes("/hob") || pathname.includes("/form") || pathname.includes("/hobdetails")) {
+    return "/hob";
   } else if (pathname.includes("/notes")) {
     return "/notes";
   } else if (pathname.includes("/calendar")) {
     return "/calendar";
-  } else if (
+  }
+  else if (pathname.includes("/organization") || pathname.includes("/organizationdetails")) {
+    return "/organization";
+  }  else if (
     pathname === "/" ||
     pathname.includes("/allExperiences") ||
     pathname.includes("/ticketdetails") ||
@@ -71,7 +76,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
         sx={{
           "& .MuiTypography-root": { // Target the nested Typography component
             fontWeight: "bold !important", // Ensure text is bold for selected item
-            fontSize: "14px",
+            fontSize: "13px",
           },
         }}
       />
@@ -80,10 +85,11 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 };
 
 // Sidebar Component
-const Sidebar = ({ isSidebar }) => {
+const Sidebar = ({ isSidebar, onLogout }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   // const isMobile = useMediaQuery("(max-width: 900px)");
+  const navigate = useNavigate();
   const location = useLocation();
   const [selected, setSelected] = useState(getActivePage(location.pathname));
 
@@ -93,6 +99,14 @@ const Sidebar = ({ isSidebar }) => {
   }, [location.pathname]);
 
   const logoSrc = logoLight;
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    onLogout(); // Call the logout function from props
+    window.location.reload(); // Reload the page to reset the state
+    navigate('/login'); // Navigate to login page
+
+  };
 
   return (
     <Drawer
@@ -112,7 +126,7 @@ const Sidebar = ({ isSidebar }) => {
         alignItems="center"
         sx={{
           width: "100%",
-          padding: "20px",
+          padding: "10px",
           background: "#ffffff",
           boxShadow: "0px 4px 4px -2px rgba(0, 0, 0, 0.1)",
           paddingBottom: 1,
@@ -132,10 +146,37 @@ const Sidebar = ({ isSidebar }) => {
           selected={selected}
           setSelected={setSelected}
         />
+       {/* <Item title="Head of the Business" to="/hob" icon={<StorefrontOutlinedIcon />} selected={selected} setSelected={setSelected} /> */}
         <Item title="Organization" to="/organization" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Notes" to="/notes" icon={<DescriptionOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Calendar" to="/calendar" icon={<CalendarTodayOutlinedIcon />} selected={selected} setSelected={setSelected} />
-        <Item title="Logout" to="/logout" icon={<LogoutOutlinedIcon />} selected={selected} setSelected={setSelected} />
+        
+              <ListItem
+                    button
+                    onClick={handleLogout}
+                    sx={{
+                      color: colors.blueAccent[500],
+                      borderRadius: "10px",
+                      marginBottom: "8px",
+                      "&:hover": {
+                        backgroundColor: colors.blueAccent[700],
+                        color: "white",
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: "inherit" }}>
+                      <LogoutOutlinedIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Logout"
+                      sx={{
+                        "& .MuiTypography-root": {
+                          fontWeight: "bold !important",
+                          fontSize: "15px",
+                        },
+                      }}
+                    />
+                  </ListItem>
       </List>
     </Drawer>
   );

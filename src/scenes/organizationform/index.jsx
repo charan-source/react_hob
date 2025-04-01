@@ -1,24 +1,25 @@
-import { Box, Button, TextField, useMediaQuery, useTheme, Autocomplete } from "@mui/material";
+import { Box, Button, TextField, useMediaQuery, useTheme, Autocomplete, Typography } from "@mui/material";
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Country, State, City } from 'country-state-city';
 import React, { useState } from 'react';
 
-const Form = () => {
+const OrganizationForm = () => {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(max-width:600px)");
-  const colors = tokens(theme.palette.mode); // Get theme colors
+  const colors = tokens(theme.palette.mode);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [orgManagerPairs, setOrgManagerPairs] = useState([{ branch: "" }]); 
 
   const handleFormSubmit = (values) => {
     console.log("Form Data:", values);
   };
 
   const initialValues = {
-    name: "",
+    organization: "",
     founderName: "",
     email: "",
     phoneCode: "",
@@ -31,7 +32,7 @@ const Form = () => {
   };
 
   const checkoutSchema = yup.object().shape({
-    name: yup.string().required("Required"),
+    organization: yup.string().required("Required"),
     founderName: yup.string(),
     email: yup.string().email("Invalid email").required("Required"),
     phoneCode: yup.string().required("Required"),
@@ -64,13 +65,20 @@ const Form = () => {
     },
   };
 
-  // Get all countries
+  const addOrgManagerPair = () => {
+    setOrgManagerPairs([...orgManagerPairs, { branch: "" }]);
+  };
+
+  const removeOrgManagerPair = (index) => {
+    if (orgManagerPairs.length > 1) {
+      const updatedPairs = [...orgManagerPairs];
+      updatedPairs.splice(index, 1);
+      setOrgManagerPairs(updatedPairs);
+    }
+  };
+
   const countries = Country.getAllCountries();
-
-  // Get states based on selected country
   const states = selectedCountry ? State.getStatesOfCountry(selectedCountry.isoCode) : [];
-
-  // Get cities based on selected state
   const cities = selectedState ? City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode) : [];
 
   return (
@@ -83,13 +91,13 @@ const Form = () => {
               gap="20px"
               gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
               sx={{
-                "& > div": { gridColumn: isNonMobile ? "span 3" : undefined },
+                "& > div": { gridColumn: isNonMobile ? "span 1" : undefined },
                 backgroundColor: "#ffffff",
               }}
             >
+              {/* Main Form Fields */}
               {[
-                { label: "First Name", name: "name" },
-                { label: "Founder Name", name: "founderName" },
+                { label: "Organization Name", name: "organization" },
                 { label: "Email Id", name: "email", type: "email" },
               ].map((field, index) => (
                 <TextField
@@ -109,7 +117,6 @@ const Form = () => {
               ))}
 
               <Box sx={{ gridColumn: "span 1", display: "flex", gap: "10px" }}>
-                {/* Phone Code Dropdown */}
                 <Autocomplete
                   fullWidth
                   options={countries}
@@ -125,51 +132,25 @@ const Form = () => {
                       sx={textFieldStyles}
                       error={!!touched.phoneCode && !!errors.phoneCode}
                       helperText={touched.phoneCode && errors.phoneCode}
-
                     />
                   )}
-
                 />
 
-                {/* Phone Number Input */}
                 <TextField
                   fullWidth
                   variant="outlined"
                   type="text"
                   label="Phone No"
-                  name="PhoneNo"
-                  value={values.PhoneNo}
+                  name="phoneno"
+                  value={values.phoneno}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={!!touched.PhoneNo && !!errors.PhoneNo}
-                  helperText={touched.PhoneNo && errors.PhoneNo}
+                  error={!!touched.phoneno && !!errors.phoneno}
+                  helperText={touched.phoneno && errors.phoneno}
                   sx={textFieldStyles}
-
                 />
               </Box>
 
-
-              {[
-
-                { label: "Address", name: "address" },
-              ].map((field, index) => (
-                <TextField
-                  key={index}
-                  fullWidth
-                  variant="outlined"
-                  type={field.type || "text"}
-                  label={field.label}
-                  name={field.name}
-                  value={values[field.name]}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched[field.name] && !!errors[field.name]}
-                  helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
-                />
-              ))}
-
-              {/* Country Dropdown */}
               <Autocomplete
                 fullWidth
                 options={countries}
@@ -177,8 +158,8 @@ const Form = () => {
                 value={selectedCountry}
                 onChange={(event, newValue) => {
                   setSelectedCountry(newValue);
-                  setSelectedState(null); // Reset state when country changes
-                  setSelectedCity(null); // Reset city when country changes
+                  setSelectedState(null);
+                  setSelectedCity(null);
                   setFieldValue("country", newValue ? newValue.name : "");
                 }}
                 renderInput={(params) => (
@@ -193,7 +174,6 @@ const Form = () => {
                 sx={{ gridColumn: "span 1" }}
               />
 
-              {/* State Dropdown */}
               <Autocomplete
                 fullWidth
                 options={states}
@@ -201,7 +181,7 @@ const Form = () => {
                 value={selectedState}
                 onChange={(event, newValue) => {
                   setSelectedState(newValue);
-                  setSelectedCity(null); // Reset city when state changes
+                  setSelectedCity(null);
                   setFieldValue("province", newValue ? newValue.name : "");
                 }}
                 renderInput={(params) => (
@@ -218,7 +198,6 @@ const Form = () => {
                 disabled={!selectedCountry}
               />
 
-              {/* City Dropdown */}
               <Autocomplete
                 fullWidth
                 options={cities}
@@ -242,25 +221,80 @@ const Form = () => {
                 disabled={!selectedState}
               />
 
-              {[
+              <TextField
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Postal Code"
+                name="postcode"
+                value={values.postcode}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.postcode && !!errors.postcode}
+                helperText={touched.postcode && errors.postcode}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+              />
+   <Box sx={{ gridColumn: "span 2", display: "flex", gap: "10px", alignItems: "center" }}></Box>
+              {/* Branch Fields - Single Column Layout */}
+              <Box >
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+                  Branch Information
+                </Typography>
+                
+                {orgManagerPairs.map((pair, index) => (
+                  <Box 
+                    key={`pair-${index}`}
+                    sx={{ 
+                      display: "flex",
+                      gap: "10px",
+                      mb: 2,
+                      alignItems: "center"
+                    }}
+                  >
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      type="text"
+                      label={index === 0 ? "Branch" : `Branch ${index + 1}`}
+                      name={`branch${index}`}
+                      value={values[`branch${index}`] || ''}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={!!touched[`branch${index}`] && !!errors[`branch${index}`]}
+                      helperText={touched[`branch${index}`] && errors[`branch${index}`]}
+                      sx={textFieldStyles}
+                    />
 
-                { label: "Postal Code", name: "postcode" },
-              ].map((field, index) => (
-                <TextField
-                  key={index}
-                  fullWidth
-                  variant="outlined"
-                  type={field.type || "text"}
-                  label={field.label}
-                  name={field.name}
-                  value={values[field.name]}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched[field.name] && !!errors[field.name]}
-                  helperText={touched[field.name] && errors[field.name]}
-                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
-                />
-              ))}
+                    {index === orgManagerPairs.length - 1 ? (
+                     <Button
+                           variant="outlined"
+                           onClick={addOrgManagerPair}
+                           sx={{ 
+                             minWidth: '100px', 
+                             height: '40px', 
+                             backgroundColor: colors.blueAccent[700], 
+                             color: "#ffffff" 
+                           }}
+                         >
+                           Add More
+                         </Button>
+                       ) : (
+                         <Button
+                           variant="outlined"
+                           onClick={() => removeOrgManagerPair(index)}
+                           sx={{ 
+                             minWidth: '100px', 
+                             height: '40px', 
+                             backgroundColor: '#ffebee' 
+                           }}
+                           color="error"
+                         >
+                           Remove
+                         </Button>
+                    )}
+                  </Box>
+                ))}
+              </Box>
             </Box>
 
             <Box display="flex" justifyContent="flex-end" mt="24px">
@@ -277,7 +311,10 @@ const Form = () => {
                   backgroundColor: colors.blueAccent[700],
                   color: "#ffffff",
                   textTransform: "none",
-                  "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                  "&:hover": { 
+                    backgroundColor: colors.blueAccent[600], 
+                    boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" 
+                  },
                 }}
               >
                 Create
@@ -290,4 +327,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default OrganizationForm;

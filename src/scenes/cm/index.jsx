@@ -35,6 +35,7 @@ const initialTickets = [
   { id: 9, name: "John Doe", email: "john@gmail.com", phone: "1234567890", city: "New York", created: "15th March, 2025", country: "India", state: "Andhra Pradesh", phoneno: "7386569469", phonenocode:"+91", customermanager:"RamBabu", organization: "TCS" },
 ];
 
+
 // Columns for DataGrid
 const columns = [
   { field: "id", headerName: "ID", flex: 0.4, headerClassName: "bold-header", disableColumnMenu: false, minWidth: 100 },
@@ -103,15 +104,15 @@ const Cm = () => {
     Navigate('/cmform')
   };
 
-
   const handleRowClick = (params) => {
     Navigate('/cmdetails', { state: { ticket: params.row } });
   };
+
   // Get Unique Values for Filters
   // const getUniqueValues = (key) => [...new Set(tickets.map((ticket) => ticket[key]))];
 
   return (
-    <Box m="20px">
+    <Box m="10px">
       {/* Toolbar */}
       <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={2} flexDirection={isMobile ? "column" : "row"}>
         {/* Search Bar */}
@@ -153,22 +154,22 @@ const Cm = () => {
           Filter
         </Button> */}
         <Button
-            variant="contained"
-            sx={{
-              background: colors.blueAccent[500],
-              fontWeight: "bold",
-              color: "#ffffff",
-              whiteSpace: "nowrap",
-              // paddingX: "15px"
-              // padding: "12px 18px ",
-              // fontSize: "14px",
-              textTransform:"none"
-            }}
-            startIcon={<AddIcon />}
-            onClick={handleNewTicket}
-          >
-             Create New
-          </Button>
+          variant="contained"
+          sx={{
+            background: colors.blueAccent[500],
+            fontWeight: "bold",
+            color: "#ffffff",
+            whiteSpace: "nowrap",
+            // paddingX: "15px"
+            // padding: "12px 18px ",
+            // fontSize: "14px",
+            textTransform: "none"
+          }}
+          startIcon={<AddIcon />}
+          onClick={handleNewTicket}
+        >
+          Create New
+        </Button>
 
         {/* Filter Menu */}
         {/* <Menu anchorEl={filterAnchorEl} open={Boolean(filterAnchorEl)} onClose={handleFilterClose}>
@@ -203,10 +204,11 @@ const Cm = () => {
       <Box height="70vh"
         m="13px 0 0 0"
         sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-            overflowX: "auto", // Enable horizontal scrolling
-          },
+          overflowX: "hidden",
+          // "& .MuiDataGrid-root": {
+          //   border: "none",
+          //   overflowX: "auto", // Enable horizontal scrolling
+          // },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
             fontSize: "16px",
@@ -227,14 +229,38 @@ const Cm = () => {
           "& .MuiDataGrid-columnSeparator": {
             display: "none", // Hide the column separator
           },
+          // "& .MuiDataGrid-root::-webkit-scrollbar": {
+          //   display: "none", // Hides scrollbar in Chrome, Safari
+          // },
           "& .MuiDataGrid-columnHeaderTitle": {
             fontWeight: "bold !important", // Ensure header text is bold
           },
+          // "& .MuiDataGrid-virtualScroller": {
+          //   backgroundColor: "#ffffff",
+          // },
+          "& .MuiDataGrid-root::-webkit-scrollbar": {
+            display: "none !important",
+          },
+          "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+            display: "none !important",
+          },
+          "& .MuiDataGrid-root": {
+            scrollbarWidth: "none !important", // Hides scrollbar in Firefox
+            "&:hover": {
+              cursor: "pointer",
+              backgroundColor:"#D9EAFD"
+            },
+          },
           "& .MuiDataGrid-virtualScroller": {
+            // scrollbarWidth: "none !important",
             backgroundColor: "#ffffff",
           },
           "& .MuiDataGrid-row": {
             borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
+            "&:hover": {
+              cursor: "pointer",
+               backgroundColor:"#D9EAFD"
+            },
           },
           "& .MuiTablePagination-root": {
             color: "#ffffff !important", // Ensure pagination text is white
@@ -293,6 +319,10 @@ const Cm = () => {
             },
             "& .MuiDataGrid-root": {
               // scrollbarWidth: "none !important", // Hides scrollbar in Firefox
+              "&:hover": {
+                cursor: "pointer",
+                   backgroundColor:"#D9EAFD"
+              },
             },
             "& .MuiDataGrid-virtualScroller": {
               // scrollbarWidth: "none !important",
@@ -300,6 +330,10 @@ const Cm = () => {
             },
             "& .MuiDataGrid-row": {
               borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
+              "&:hover": {
+                cursor: "pointer",
+                backgroundColor:"#D9EAFD"
+              },
             },
             "& .MuiTablePagination-root": {
               color: "#ffffff !important", // Ensure pagination text is white

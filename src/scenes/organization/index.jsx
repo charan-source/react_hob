@@ -100,7 +100,7 @@ const Organization = () => {
   // };
 
   const handleNewTicket = () => {
-    Navigate('/form')
+    Navigate('/organizationform')
   };
 
   const handleRowClick = (params) => {

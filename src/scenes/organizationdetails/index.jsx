@@ -2,47 +2,36 @@ import { Box, Button, TextField, useMediaQuery, useTheme, Autocomplete, Typograp
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Country, State, City } from 'country-state-city';
 import { useLocation } from 'react-router-dom';
 
 const OrganizationDetails = () => {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(max-width:600px)");
-  // const isMobile = useMediaQuery("(max-width:600px)");
   const colors = tokens(theme.palette.mode);
-  const [selectedCountry, setSelectedCountry] = useState(null);
-  const [selectedState, setSelectedState] = useState(null);
-  const [selectedCity, setSelectedCity] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [orgManagerPairs, setOrgManagerPairs] = useState([{ branch: "" }]);
+  const [formInstances, setFormInstances] = useState([{ 
+    id: 1,
+    selectedCountry: null,
+    selectedState: null,
+    selectedCity: null,
+    values: {
+      organization: "",
+      name: "",
+      branch: "",
+      email: "",
+      address: "",
+      phoneCode: "",
+      PhoneNo: "",
+      country: "",
+      state: "",
+      city: ""
+    }
+  }]);
+  const formRefs = useRef([]);
   const location = useLocation();
   const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
-
-  useEffect(() => {
-    if (ticket.country) {
-      const country = Country.getAllCountries().find((c) => c.name === ticket.country);
-      setSelectedCountry(country || null);
-    }
-    if (ticket.state && selectedCountry) {
-      const state = State.getStatesOfCountry(selectedCountry.isoCode).find((s) => s.name === ticket.state);
-      setSelectedState(state || null);
-    }
-    if (ticket.city && selectedState) {
-      const city = City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode).find((c) => c.name === ticket.city);
-      setSelectedCity(city || null);
-    }
-  }, [ticket, selectedCountry, selectedState]);
-
-  const handleFormSubmit = (values) => {
-    const fullPhoneNumber = `${values.phoneCode}${values.PhoneNo}`;
-    console.log("Form Data:", { ...values, fullPhoneNumber });
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-  };
 
   const initialValues = {
     name: ticket.name?.split(' ')[0] || "",
@@ -57,28 +46,60 @@ const OrganizationDetails = () => {
     phoneCode: ticket.phonenocode || "",
     address: ticket.address || "",
     organization: ticket.organization || "",
+    branch: ""
   };
 
   const checkoutSchema = yup.object().shape({
+    organization: yup.string().required("Required"),
     name: yup.string().required("Required"),
-    middleName: yup.string(),
-    lastName: yup.string().required("Required"),
-    street: yup.string().required("Required"),
-    city: yup.string().required("Required"),
-    state: yup.string().required("Required"),
-    country: yup.string().required("Required"),
+    branch: yup.string().required("Required"),
     email: yup.string().email("Invalid email").required("Required"),
+    address: yup.string().required("Required"),
+    phoneCode: yup.string().required("Required"),
     PhoneNo: yup
       .string()
       .matches(/^[0-9]+$/, "Only numbers are allowed")
       .min(10, "Must be at least 10 digits")
       .required("Required"),
-    phoneCode: yup.string().required("Required"),
-    address: yup.string().required("Required"),
-    organization: yup.string().required("Required"),
+    country: yup.string().required("Required"),
+    state: yup.string().required("Required"),
+    city: yup.string().required("Required"),
   });
 
-  // Styles for editable fields
+  const handleFormSubmit = (values, formId) => {
+    console.log("Form Data:", values);
+    // Update the specific form instance with the submitted values
+    setFormInstances(prev => prev.map(form => 
+      form.id === formId ? { ...form, values } : form
+    ));
+    setIsEditing(false);
+  };
+
+  const handleAddForm = () => {
+    const newId = formInstances.length > 0 ? Math.max(...formInstances.map(f => f.id)) + 1 : 1;
+    setFormInstances([...formInstances, { 
+      id: newId,
+      selectedCountry: null,
+      selectedState: null,
+      selectedCity: null,
+      values: { ...initialValues, branch: `Branch ${newId}` }
+    }]);
+  };
+
+  const handleRemoveForm = (id) => {
+    if (formInstances.length > 1) {
+      setFormInstances(formInstances.filter((form) => form.id !== id));
+    }
+  };
+
+  const handleCreateSubmit = () => {
+    formRefs.current.forEach(formRef => {
+      if (formRef && formRef.handleSubmit) {
+        formRef.handleSubmit();
+      }
+    });
+  };
+
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "8px",
@@ -99,43 +120,6 @@ const OrganizationDetails = () => {
       color: "#555",
       fontSize: "16px",
     },
-  };
-
-  // Styles for disabled fields (view mode)
-  // const disabledFieldStyles = {
-  //   padding: "12px",
-  //   backgroundColor: "#f5f5f5",
-  //   borderRadius: "8px",
-  //   minHeight: "50px",
-  //   display: "flex",
-  //   alignItems: "center",
-  //   fontSize: "16px",
-  //   color: "#000",
-  //   boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
-  //   border: "1px solid transparent",
-  // };
-
-
-  const addOrgManagerPair = () => {
-    setOrgManagerPairs([...orgManagerPairs, { branch: "" }]);
-  };
-
-  const removeOrgManagerPair = (index) => {
-    if (orgManagerPairs.length > 1) {
-      const updatedPairs = [...orgManagerPairs];
-      updatedPairs.splice(index, 1);
-      setOrgManagerPairs(updatedPairs);
-    }
-  };
-
-  const countries = Country.getAllCountries();
-  const states = selectedCountry ? State.getStatesOfCountry(selectedCountry.isoCode) : [];
-  const cities = selectedState ? City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode) : [];
-
-  const getPhoneCodeDisplay = (phoneCode) => {
-    if (!phoneCode) return "-";
-    const country = countries.find(c => `+${c.phonecode}` === phoneCode);
-    return country ? `+${country.phonecode} (${country.name})` : phoneCode;
   };
 
   const renderField = (heading, name, value, fieldComponent, gridSpan = 1) => (
@@ -160,18 +144,37 @@ const OrganizationDetails = () => {
     </Box>
   );
 
+  const renderForm = (formInstance) => {
+    const { id, values, selectedCountry, selectedState, selectedCity } = formInstance;
+    const countries = Country.getAllCountries();
+    const states = selectedCountry ? State.getStatesOfCountry(selectedCountry.isoCode) : [];
+    const cities = selectedState ? City.getCitiesOfState(selectedCountry?.isoCode, selectedState.isoCode) : [];
 
-  return (
-    <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
-      <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
+    const getPhoneCodeDisplay = (phoneCode) => {
+      if (!phoneCode) return "-";
+      const country = countries.find(c => `+${c.phonecode}` === phoneCode);
+      return country ? `+${country.phonecode} (${country.name})` : phoneCode;
+    };
+
+    return (
+      <Formik
+        key={id}
+        initialValues={values}
+        validationSchema={checkoutSchema}
+        onSubmit={(values) => handleFormSubmit(values, id)}
+        innerRef={ref => formRefs.current[id] = ref}
+      >
         {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
-          <form onSubmit={handleSubmit}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4, p: 3, border: '1px solid #eee', borderRadius: '8px' }}>
+            <Typography variant="h6" gutterBottom>
+              {id === 1 ? "Main Organization" : `Branch ${id - 1}`}
+            </Typography>
+
             <Box
               display="grid"
               gap="20px"
               gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
             >
-              {/* Organization Name */}
               {renderField(
                 "Organization Name",
                 "organization",
@@ -190,26 +193,24 @@ const OrganizationDetails = () => {
                 />
               )}
 
-              {/* Founder Name */}
               {renderField(
-                "Founder Name",
-                "name",
-                values.name,
+                "Branch Name",
+                "branch",
+                values.branch,
                 <TextField
                   fullWidth
                   variant="outlined"
                   type="text"
-                  name="name"
-                  value={values.name}
+                  name="branch"
+                  value={values.branch}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={!!touched.name && !!errors.name}
-                  helperText={touched.name && errors.name}
+                  error={!!touched.branch && !!errors.branch}
+                  helperText={touched.branch && errors.branch}
                   sx={textFieldStyles}
                 />
               )}
 
-              {/* Email */}
               {renderField(
                 "Email Id",
                 "email",
@@ -228,7 +229,6 @@ const OrganizationDetails = () => {
                 />
               )}
 
-              {/* Address */}
               {renderField(
                 "Address",
                 "address",
@@ -247,7 +247,6 @@ const OrganizationDetails = () => {
                 />
               )}
 
-              {/* Phone Number */}
               {renderField(
                 "Phone Number",
                 "PhoneNo",
@@ -264,7 +263,6 @@ const OrganizationDetails = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        // label="Phone Code"
                         sx={textFieldStyles}
                         error={!!touched.phoneCode && !!errors.phoneCode}
                         helperText={touched.phoneCode && errors.phoneCode}
@@ -275,7 +273,6 @@ const OrganizationDetails = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    // label="Phone No"
                     name="PhoneNo"
                     value={values.PhoneNo}
                     onChange={handleChange}
@@ -288,7 +285,6 @@ const OrganizationDetails = () => {
                 1
               )}
 
-              {/* Country */}
               {renderField(
                 "Country",
                 "country",
@@ -299,15 +295,16 @@ const OrganizationDetails = () => {
                   getOptionLabel={(option) => option.name}
                   value={selectedCountry}
                   onChange={(event, newValue) => {
-                    setSelectedCountry(newValue);
-                    setSelectedState(null);
-                    setSelectedCity(null);
                     setFieldValue("country", newValue ? newValue.name : "");
+                    updateFormInstance(id, { 
+                      selectedCountry: newValue,
+                      selectedState: null,
+                      selectedCity: null
+                    });
                   }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      // label="Country"
                       sx={textFieldStyles}
                       error={!!touched.country && !!errors.country}
                       helperText={touched.country && errors.country}
@@ -316,7 +313,6 @@ const OrganizationDetails = () => {
                 />
               )}
 
-              {/* State */}
               {renderField(
                 "State",
                 "state",
@@ -327,14 +323,15 @@ const OrganizationDetails = () => {
                   getOptionLabel={(option) => option.name}
                   value={selectedState}
                   onChange={(event, newValue) => {
-                    setSelectedState(newValue);
-                    setSelectedCity(null);
                     setFieldValue("state", newValue ? newValue.name : "");
+                    updateFormInstance(id, { 
+                      selectedState: newValue,
+                      selectedCity: null
+                    });
                   }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      // label="State"
                       sx={textFieldStyles}
                       error={!!touched.state && !!errors.state}
                       helperText={touched.state && errors.state}
@@ -345,7 +342,6 @@ const OrganizationDetails = () => {
                 />
               )}
 
-              {/* City */}
               {renderField(
                 "City",
                 "city",
@@ -356,13 +352,12 @@ const OrganizationDetails = () => {
                   getOptionLabel={(option) => option.name}
                   value={selectedCity}
                   onChange={(event, newValue) => {
-                    setSelectedCity(newValue);
                     setFieldValue("city", newValue ? newValue.name : "");
+                    updateFormInstance(id, { selectedCity: newValue });
                   }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      // label="City"
                       sx={textFieldStyles}
                       error={!!touched.city && !!errors.city}
                       helperText={touched.city && errors.city}
@@ -372,169 +367,102 @@ const OrganizationDetails = () => {
                   disabled={!selectedState}
                 />
               )}
-
-              <Box sx={{ gridColumn: "span 1", display: "flex", gap: "10px", alignItems: "center" }}></Box>
-
-              {/* Branch Fields - Single Column Layout */}
-              {/* Branch Fields - Single Column Layout */}
-              {/* Branch Fields - Single Column Layout */}
-              {/* Branch Fields - Single Column Layout */}
-              {/* Branch Fields - Full Width Container */}
-              <Box sx={{
-                gridColumn: "1 / -1",
-                display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                gap: "20px"
-              }}>
-                {orgManagerPairs.map((pair, index) => (
-                  <Box key={`pair-${index}`} sx={{
-                    gridColumn: "span 1",
-                    display: "flex",
-                    flexDirection: isNonMobile ? "column" : "row",
-                    alignItems: isNonMobile ? "flex-start" : "center",
-                    gap: isNonMobile ? "10px" : "0px"
-                  }}>
-                    {/* Input field */}
-                    <Box sx={{ flex: 1, width: "100%" }}>
-                      <Typography variant="subtitle1" sx={{ mb: 1, color: "#555" }}>
-                        {index === 0 ? "Branch" : `Branch ${index + 1}`}
-                      </Typography>
-                      {isEditing ? (
-                        <TextField
-                          fullWidth
-                          variant="outlined"
-                          type="text"
-                          name={`branch${index}`}
-                          value={values[`branch${index}`] || ''}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={!!touched[`branch${index}`] && !!errors[`branch${index}`]}
-                          helperText={touched[`branch${index}`] && errors[`branch${index}`]}
-                          sx={textFieldStyles}
-                        />
-                      ) : (
-                        <Box sx={{
-                          padding: "12px",
-                          backgroundColor: "#f5f5f5",
-                          borderRadius: "4px",
-                          minHeight: "50px",
-                          display: "flex",
-                          alignItems: "center"
-                        }}>
-                          {values[`branch${index}`] || "-"}
-                        </Box>
-                      )}
-                    </Box>
-
-                    {/* Buttons - responsive positioning */}
-                    {isEditing && (
-                      <Box sx={{
-                        ml: isNonMobile ? 0 : 2,
-                        // mt: isNonMobile ? 1 : 0,
-                        marginTop:"30px",
-                        alignSelf: isNonMobile ? "flex-start" : "center"
-                      }}>
-                        {index === orgManagerPairs.length - 1 ? (
-                          <Button
-                            variant="outlined"
-                            onClick={addOrgManagerPair}
-                            sx={{
-                              minWidth: '100px',
-                              height: '40px',
-                              backgroundColor: colors.blueAccent[700],
-                              color: "#ffffff"
-                            }}
-                          >
-                            Add More
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outlined"
-                            onClick={() => removeOrgManagerPair(index)}
-                            sx={{
-                              minWidth: '100px',
-                              height: '40px',
-                              backgroundColor: '#ffebee'
-                            }}
-                            color="error"
-                          >
-                            Remove
-                          </Button>
-                        )}
-                      </Box>
-                    )}
-                  </Box>
-                ))}
-              </Box>
             </Box>
 
-            <Box display="flex" justifyContent="flex-end" mt="24px">
-              {!isEditing ? (
+            {id > 1 && (
+              <Box display="flex" justifyContent="flex-start" mt="10px">
                 <Button
-                  type="button"
-                  variant="contained"
-                  onClick={() => setIsEditing(true)}
-                  sx={{
-                    padding: "12px 24px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    borderRadius: "8px",
-                    boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                    transition: "0.3s",
-                    backgroundColor: colors.blueAccent[700],
-                    color: "#ffffff",
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  onClick={() => handleRemoveForm(id)}
+                  sx={{ 
                     textTransform: "none",
-                    "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
+                    padding: "4px 8px",
+                    fontSize: "0.75rem"
                   }}
                 >
-                  Edit
+                  Remove Branch
                 </Button>
-              ) : (
-                <>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      padding: "12px 24px",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      borderRadius: "8px",
-                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                      transition: "0.3s",
-                      backgroundColor: colors.blueAccent[700],
-                      color: "#ffffff",
-                      textTransform: "none",
-                      "&:hover": { backgroundColor: colors.blueAccent[600], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
-                    }}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="contained"
-                    onClick={handleCancel}
-                    sx={{
-                      padding: "12px 24px",
-                      marginLeft: "10px",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      borderRadius: "8px",
-                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                      transition: "0.3s",
-                      backgroundColor: colors.redAccent[600],
-                      color: "#ffffff",
-                      textTransform: "none",
-                      "&:hover": { backgroundColor: colors.redAccent[700], boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" },
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              )}
-            </Box>
-          </form>
+              </Box>
+            )}
+          </Box>
         )}
       </Formik>
+    );
+  };
+
+  const updateFormInstance = (id, updates) => {
+    setFormInstances(prev => prev.map(form => 
+      form.id === id ? { ...form, ...updates } : form
+    ));
+  };
+
+  return (
+    <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "8px" }}>
+      {formInstances.map(renderForm)}
+
+      <Box display="flex" justifyContent="flex-end" mt="24px" gap="10px">
+        {!isEditing ? (
+          <Button
+            type="button"
+            variant="contained"
+            onClick={() => setIsEditing(true)}
+            sx={{
+              padding: "12px 24px",
+              fontSize: "14px",
+              fontWeight: "bold",
+              borderRadius: "8px",
+              boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+              transition: "0.3s",
+              backgroundColor: colors.blueAccent[700],
+              color: "#ffffff",
+              textTransform: "none",
+              "&:hover": { 
+                backgroundColor: colors.blueAccent[600], 
+                boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" 
+              },
+            }}
+          >
+            Edit
+          </Button>
+        ) : (
+          <>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={handleAddForm} 
+              sx={{ 
+                textTransform: "none",
+                padding: "8px 16px"
+              }}
+            >
+              + Add Branch
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleCreateSubmit}
+              sx={{
+                padding: "12px 24px",
+                fontSize: "14px",
+                fontWeight: "bold",
+                borderRadius: "8px",
+                boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                transition: "0.3s",
+                backgroundColor: colors.blueAccent[700],
+                color: "#ffffff",
+                textTransform: "none",
+                "&:hover": { 
+                  backgroundColor: colors.blueAccent[600], 
+                  boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)" 
+                },
+              }}
+            >
+              Save
+            </Button>
+          </>
+        )}
+      </Box>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import {  useState } from "react";
+import { Routes, Route,  Navigate } from "react-router-dom";
 import { CssBaseline, Box, useMediaQuery } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -47,8 +47,8 @@ function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const isMobile = useMediaQuery("(max-width: 900px)");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const navigate = useNavigate();
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // const navigate = useNavigate();
 
   // Create theme with Poppins font
   const appTheme = createTheme(theme, {
@@ -97,20 +97,20 @@ function App() {
     },
   });
 
-  useEffect(() => {
-    const token = sessionStorage.getItem('token');
-    setIsAuthenticated(!!token);  // Convert token existence to boolean
-  }, []);
+  // useEffect(() => {
+  //   const token = sessionStorage.getItem('token');
+  //   setIsAuthenticated(!!token);  // Convert token existence to boolean
+  // }, []);
   
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    navigate('/');
-  };
-const handleLogout = () => { 
-    sessionStorage.removeItem('token');
-    setIsAuthenticated(false);
-    navigate('/login');
-  }
+  // const handleLogin = () => {
+  //   setIsAuthenticated(true);
+  //   navigate('/');
+  // };
+// const handleLogout = () => { 
+//     sessionStorage.removeItem('token');
+//     setIsAuthenticated(false);
+//     navigate('/login');
+//   }
 
 
   return (
@@ -119,12 +119,12 @@ const handleLogout = () => {
         <CssBaseline />
 
         {/* Topbar: Full width at the top */}
-        <Box sx={{ width: "100vw", top: 5, zIndex: 1000, display: isAuthenticated ? "block" : "none" }}>
-          <Topbar setIsSidebar={setIsSidebar} onLogout = {handleLogout} />
+        <Box sx={{ width: "100vw", top: 5, zIndex: 1000 }}>
+          <Topbar setIsSidebar={setIsSidebar}  />
         </Box>
 
         {/* Sidebar: Fixed on the left */}
-        {isAuthenticated && !isMobile && isSidebar && (
+        { !isMobile && isSidebar && (
           <Box
             sx={{
               position: "fixed",
@@ -136,7 +136,7 @@ const handleLogout = () => {
               // display: isAuthenticated  === 'true' ? "block" : "none"
             }}
           >
-            <Sidebar isSidebar={isSidebar} onLogout = {handleLogout} />
+            <Sidebar isSidebar={isSidebar}  />
           </Box>
         )}
 
@@ -145,7 +145,7 @@ const handleLogout = () => {
           component="main"
           sx={{
             flexGrow: 1,
-            marginLeft: isMobile || !isAuthenticated ? "0px" : isSidebar ? "260px" : "0px" ,
+            marginLeft: isMobile ? "0px" : isSidebar ? "260px" : "0px" ,
             padding: "20px 20px 20px",
             overflowY: "auto",
             transition: "margin 0.3s ease-in-out",
@@ -160,13 +160,14 @@ const handleLogout = () => {
             fontFamily: 'Poppins, sans-serif !important',
           }}
         >
-          {isAuthenticated ? (
+       
             <Routes>
               <Route path="/" element={<Dashboard />} />
              {/* <Route path="/login" element={<Login />}  onLogin={handleLogin}/> */}
               <Route path="/cm" element={<Cm />} />
               <Route path="/crm" element={<Crm />} />
               {/* <Route path="/hob" element={<Hob />} /> */}
+              <Route path="/login" element={<Login />} />
               <Route path="/organization" element={<Organization />} />
               <Route path="/allExperiences" element={<AllExperiences />} />
               <Route path="/newExperiences" element={<NewExperiences />} />
@@ -192,12 +193,7 @@ const handleLogout = () => {
               <Route path="/geography" element={<Geography />} />
               <Route path="*" element={<Navigate to="/" />} /> {/* Redirect unknown routes */}
             </Routes>
-          ) : (
-            <Routes>
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="*" element={<Navigate to="/login" />} />
-            </Routes>
-          )}
+      
         </Box>
       </ThemeProvider>
     </ColorModeContext.Provider>

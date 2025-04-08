@@ -2,7 +2,8 @@ import { Box, IconButton, useTheme, Typography, useMediaQuery, Modal, Backdrop, 
 import { useState, useEffect } from "react";
 import { tokens } from "../../theme";
 import { Link, useLocation } from "react-router-dom";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import PersonIcon from "@mui/icons-material/Person";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
@@ -12,6 +13,7 @@ import HandshakeOutlinedIcon from "@mui/icons-material/HandshakeOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 // import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import TaskOutlinedIcon from "@mui/icons-material/TaskOutlined";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import logoLight from "./logo.png";
@@ -29,6 +31,8 @@ const getActivePage = (pathname) => {
     return "/notes";
   } else if (pathname.includes("/calendar")) {
     return "/calendar";
+  } else if (pathname.includes("/tasks")) {
+    return "/tasks";
   } else if (pathname.includes("/organization")) {
     return "/organization";
   } else if (
@@ -111,6 +115,8 @@ const Topbar = ({ onLogout}) => {
         return " Create a New Customer Relationship Manager";
       case "/hob":
         return "Head of the Business";
+      case "/tasks":
+          return "Tasks List";  
       case "/crmdetails":
         return "Customer Relationship Manager Details";
       case "/cmdetails":
@@ -171,6 +177,8 @@ const Topbar = ({ onLogout}) => {
         return { primaryTitle: "Customer Relationship Manager", secondaryTitle: "Create a New Customer Relationship Manager" };
       case "/hob":
         return { primaryTitle: "Head of the Business", secondaryTitle: null };
+      case "/tasks":
+        return { primaryTitle: "Tasks List", secondaryTitle: null };
       case "/form":
         return { primaryTitle: "Head of the Business", secondaryTitle: "Create a New Head of the Business Unit" };
       case "/hobdetails":
@@ -180,9 +188,9 @@ const Topbar = ({ onLogout}) => {
       case "/newExperiences":
         return { primaryTitle: "New Experiences", secondaryTitle: null  };
       case "/pendingExperiences":
-        return { primaryTitle: "Pending Experiences", secondaryTitle: null  };
+        return { primaryTitle: "Pending Experiences", secondaryTitle: null };
       case "/resolvedExperiences":
-        return { primaryTitle: "Resolved Experiences", secondaryTitle:  null  };
+        return { primaryTitle: "Resolved Experiences", secondaryTitle: null };
       case "/profile":
         return { primaryTitle: "Profile", secondaryTitle: null };
       case "/notes":
@@ -284,12 +292,12 @@ const Topbar = ({ onLogout}) => {
             sx={{
               bgcolor: "#fefefe !important",
               boxShadow: "0px 4px 4px -2px rgba(0, 0, 0, 0.1)",
-              marginBottom: 2,
-              padding: 2,
+              // marginBottom: 2,
+              // padding: null,
             }}
           >
             {/* Logo on Mobile */}
-            <Box sx={{ maxWidth: "180px", height: "50px", backgroundColor: "#fefefe !important" }}>
+            <Box sx={{ maxWidth: "200px", height: "65px", backgroundColor: "#fefefe !important" }}>
               <img
                 src={logoSrc}
                 alt="logo"
@@ -318,7 +326,7 @@ const Topbar = ({ onLogout}) => {
               paddingX: isMobile ? 2 : 9,
               paddingY: 1,
               boxShadow: "0px 4px 4px -2px rgba(0, 0, 0, 0.1)",
-              padding: 4,
+              padding: 1,
             }}
           >
             {/* Greeting Message */}
@@ -352,6 +360,26 @@ const Topbar = ({ onLogout}) => {
                 alignItems: "center",
               }}
             >
+
+<IconButton  sx={{ gap: 1 }}>
+                <Box
+                  sx={{
+                    width: isMobile ? 25 : 30,
+                    height: isMobile ? 25 : 30,
+                    borderRadius: "50%",
+                    backgroundColor: colors.blueAccent[500],
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                 <NotificationsIcon sx={{ fontSize: isMobile ? 18 : 20, color: "#fff" }} />
+
+                </Box>
+                {/* <Typography sx={{ color: "#000", fontSize: isMobile ? 15 : 17 }}>
+                  Delphin
+                </Typography> */}
+              </IconButton>
               <IconButton onClick={() => navigate("profile")} sx={{ gap: 1 }}>
                 <Box
                   sx={{
@@ -364,7 +392,7 @@ const Topbar = ({ onLogout}) => {
                     justifyContent: "center",
                   }}
                 >
-                  <PersonOutlinedIcon sx={{ fontSize: isMobile ? 18 : 20, color: "#fff" }} />
+                  <PersonIcon sx={{ fontSize: isMobile ? 18 : 20, color: "#fff" }} />
                 </Box>
                 <Typography sx={{ color: "#000", fontSize: isMobile ? 15 : 17 }}>
                   Delphin
@@ -418,7 +446,7 @@ const Topbar = ({ onLogout}) => {
                 alignItems: "center",
               }}
             >
-              <IconButton onClick={() => navigate("profile")} sx={{ gap: 1 }}>
+            <IconButton  sx={{ gap: 1 }}>
                 <Box
                   sx={{
                     width: isMobile ? 25 : 30,
@@ -430,7 +458,26 @@ const Topbar = ({ onLogout}) => {
                     justifyContent: "center",
                   }}
                 >
-                  <PersonOutlinedIcon sx={{ fontSize: isMobile ? 18 : 20, color: "#fff" }} />
+                 <NotificationsIcon sx={{ fontSize: isMobile ? 18 : 20, color: "#fff" }} />
+
+                </Box>
+                {/* <Typography sx={{ color: "#000", fontSize: isMobile ? 15 : 17 }}>
+                  Delphin
+                </Typography> */}
+              </IconButton>
+              <IconButton onClick={() => navigate("profile")} sx={{ gap: 1 }}>
+                <Box
+                  sx={{
+                    width: isMobile ? 25 : 30,
+                    height: isMobile ? 25 : 30,
+                    borderRadius: "50%",
+                    backgroundColor: colors.blueAccent[500],
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                 > 
+                  <PersonIcon sx={{ fontSize: isMobile ? 18 : 20, color: "#fff" }} />
                 </Box>
                 <Typography sx={{ color: "#000", fontSize: isMobile ? 15 : 17 }}>
                   Delphin
@@ -563,8 +610,8 @@ const Topbar = ({ onLogout}) => {
             <Item title="Dashboard" to="/" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <Item title="Customer Manager" to="/cm" icon={<PeopleAltOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <Item title="Customer Relationship Manager" to="/crm" icon={<HandshakeOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
-            {/* <Item title="Head of the Business" to="/hob" icon={<StorefrontOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} /> */}
             <Item title="Organization" to="/organization" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
+            <Item title="Tasks" to="/tasks" icon={<TaskOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <Item title="Notes" to="/notes" icon={<DescriptionOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <Item title="Calendar" to="/calendar" icon={<CalendarTodayOutlinedIcon />} selected={selected} setSelected={setSelected} handleClose={() => setIsModalOpen(false)} />
             <ListItem

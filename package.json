@@ -32,6 +32,8 @@
     "downloadjs": "^1.4.7",
     "file-saver": "^2.0.5",
     "formik": "^2.2.9",
+    "jodit-pro": "^4.6.4",
+    "jodit-react": "^5.2.19",
     "react": "^18.2.0",
     "react-chartjs-2": "^4.3.1",
     "react-country-region-selector": "^4.0.2",

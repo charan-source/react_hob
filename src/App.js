@@ -42,7 +42,7 @@ import CrmForm from "./scenes/crmform";
 import BsuForm from "./scenes/bsuform";
 import OrganizationForm from "./scenes/organizationform";
 import Login from "./scenes/login";
-
+import Tasks from "./scenes/tasks";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -166,7 +166,7 @@ function App() {
              {/* <Route path="/login" element={<Login />}  onLogin={handleLogin}/> */}
               <Route path="/cm" element={<Cm />} />
               <Route path="/crm" element={<Crm />} />
-              {/* <Route path="/hob" element={<Hob />} /> */}
+              <Route path="/tasks" element={<Tasks />} />
               <Route path="/login" element={<Login />} />
               <Route path="/organization" element={<Organization />} />
               <Route path="/allExperiences" element={<AllExperiences />} />

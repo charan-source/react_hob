@@ -9,7 +9,9 @@ import HandshakeOutlinedIcon from "@mui/icons-material/HandshakeOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 // import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import TaskOutlinedIcon from "@mui/icons-material/TaskOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+
 import { useNavigate } from "react-router-dom";
 import logoLight from "./logo.png";
 
@@ -23,6 +25,8 @@ const getActivePage = (pathname) => {
     return "/hob";
   } else if (pathname.includes("/notes")) {
     return "/notes";
+  } else if (pathname.includes("/tasks")) {
+      return "/tasks";
   } else if (pathname.includes("/calendar")) {
     return "/calendar";
   }
@@ -101,9 +105,9 @@ const Sidebar = ({ isSidebar, onLogout }) => {
   const logoSrc = logoLight;
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    onLogout(); // Call the logout function from props
-    window.location.reload(); // Reload the page to reset the state
+    // localStorage.removeItem('token');
+    // onLogout(); // Call the logout function from props
+    // window.location.reload(); // Reload the page to reset the state
     navigate('/login'); // Navigate to login page
 
   };
@@ -126,10 +130,11 @@ const Sidebar = ({ isSidebar, onLogout }) => {
         alignItems="center"
         sx={{
           width: "100%",
-          padding: "10px",
+          padding: "20px",
           background: "#ffffff",
           boxShadow: "0px 4px 4px -2px rgba(0, 0, 0, 0.1)",
           paddingBottom: 1,
+
         }}
       >
         <img src={logoSrc} alt="logo" style={{ width: "100%", cursor: "pointer" }} />
@@ -146,8 +151,8 @@ const Sidebar = ({ isSidebar, onLogout }) => {
           selected={selected}
           setSelected={setSelected}
         />
-       {/* <Item title="Head of the Business" to="/hob" icon={<StorefrontOutlinedIcon />} selected={selected} setSelected={setSelected} /> */}
         <Item title="Organization" to="/organization" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} />
+        <Item title="Tasks" to="/tasks" icon={<TaskOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Notes" to="/notes" icon={<DescriptionOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Calendar" to="/calendar" icon={<CalendarTodayOutlinedIcon />} selected={selected} setSelected={setSelected} />
         
@@ -155,13 +160,10 @@ const Sidebar = ({ isSidebar, onLogout }) => {
                     button
                     onClick={handleLogout}
                     sx={{
-                      color: colors.blueAccent[500],
+                      // color: colors.blueAccent[500],
                       borderRadius: "10px",
                       marginBottom: "8px",
-                      "&:hover": {
-                        backgroundColor: colors.blueAccent[700],
-                        color: "white",
-                      },
+
                     }}
                   >
                     <ListItemIcon sx={{ color: "inherit" }}>
@@ -171,8 +173,9 @@ const Sidebar = ({ isSidebar, onLogout }) => {
                       primary="Logout"
                       sx={{
                         "& .MuiTypography-root": {
-                          fontWeight: "bold !important",
-                          fontSize: "15px",
+                          fontWeight: "bold !important", // Ensure text is bold for selected item
+                          fontSize: "13px",
+                
                         },
                       }}
                     />

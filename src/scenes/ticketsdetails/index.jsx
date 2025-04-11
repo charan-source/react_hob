@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, Typography, Button, useTheme, TextField } from "@mui/material";
+import { Box, useMediaQuery, Typography, Button, useTheme, TextField, Autocomplete } from "@mui/material";
 import { Formik } from "formik";
 import { tokens } from "../../theme";
 import * as yup from "yup";
@@ -8,9 +8,11 @@ import download from 'downloadjs';
 import JoditEditor from 'jodit-react';
 // import {Jodit} from 'jodit-pro';
 import 'jodit-pro/es5/jodit.min.css';
-import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
-import HelpIcon from '@mui/icons-material/Help';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+// import { Block } from "@mui/icons-material";
+// import PhoneIcon from '@mui/icons-material/Phone';
+// import EmailIcon from '@mui/icons-material/Email';
+// import HelpIcon from '@mui/icons-material/Help';
 
 const TicketDetails = () => {
   const theme = useTheme();
@@ -129,6 +131,20 @@ const TicketDetails = () => {
     }, 1000);
   };
 
+  const customerManagers = [
+    "Rambabu",
+    "Charan",
+    "Lakshman",
+    "Satya dev",
+    "Ram",
+  ];
+
+
+  const priority = [
+    "Urgent",
+    "High",
+    "Low",
+  ];
   return (
     <Box sx={{
       display: "flex",
@@ -146,7 +162,7 @@ const TicketDetails = () => {
         width: isLargeScreen ? "60%" : "100%"
       }}>
         <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
-          {({ values }) => (
+          {({ values, setFieldValue, touched, errors }) => (
             <form>
               <Box
                 display="grid"
@@ -177,87 +193,133 @@ const TicketDetails = () => {
                   <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Customer Manager</Typography>
                   <Typography>{values.cmname}</Typography>
                 </Box>
+
                 {isEditing ? (
-
-          
-
-
-          
-<Box sx={{ gridColumn: { xs: "auto", sm: "span 2", md: "auto" } }}>
-<Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Customer Relationship Manager</Typography>
-{/* <Box> */}
-
-  <TextField 
-  fullWidth 
-  // placeholder="Type your message..." 
-  size="small"
-  variant="outlined"
-  value={values.crmname}
-  // onChange={(e) => setNewMessage(e.target.value)}
-  // onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-  />
-{/* </Box> */}
-</Box>
-      ) : (
-
-        <Box sx={{ gridColumn: { xs: "auto", sm: "span 2", md: "auto" } }}>
-        <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Customer Relationship Manager</Typography>
-        <Typography>{values.crmname}</Typography>
-      </Box>
-        
-      )}
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>
+                      Customer Relationship Manager
+                    </Typography>
+                    <Autocomplete
+                      fullWidth
+                      options={customerManagers}
+                      value={values.crmname || null}
+                      onChange={(event, newValue) => {
+                        setFieldValue("crmname", newValue || "");
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          sx={{
+                            display: isEditing ? "block" : "none",
+                            '& .MuiInputBase-root': {  // Target the input container
+                              height: '40px',          // Adjust input height
+                            }
+                          }}
+                          error={!!touched.crmname && !!errors.crmname}
+                          helperText={touched.crmname && errors.crmname}
+                          disabled={!isEditing}
+                        />
+                      )}
+                      disabled={!isEditing}
+                      sx={{
+                        gridColumn: "span 1",
+                        '& .MuiAutocomplete-listbox': {  // Target the dropdown list
+                          maxHeight: '200px',           // Set maximum height
+                          padding: 0,                   // Remove default padding
+                          '& .MuiAutocomplete-option': { // Target each option
+                            minHeight: '32px',          // Reduce option height
+                            padding: '4px 16px',        // Adjust padding
+                          }
+                        }
+                      }}
+                      freeSolo
+                      forcePopupIcon
+                      popupIcon={<ArrowDropDownIcon />}
+                    />
+                  </Box>
+                ) : (
+                  <Box sx={{ gridColumn: { xs: "auto", sm: "span 2", md: "auto" } }}>
+                    <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Customer Relationship Manager</Typography>
+                    <Typography>{values.crmname}</Typography>
+                  </Box>
+                )}
                 {isEditing ? (
-                <Box>
-
-
-                  <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Priority</Typography>
-                  <TextField 
-                  fullWidth 
-                  // placeholder="Type your message..." 
-                  size="small"
-                  variant="outlined"
-                  value={values.priority}
-                  // onChange={(e) => setNewMessage(e.target.value)}
-                  // onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                  />
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold", marginBottom: "5px" }}>
+                      Priority
+                    </Typography>
+                    <Autocomplete
+                      fullWidth
+                      options={priority}
+                      value={values.priority || null}
+                      onChange={(event, newValue) => {
+                        setFieldValue("priority", newValue || "");
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          sx={{
+                            display: isEditing ? "block" : "none",
+                            '& .MuiInputBase-root': {  // Target the input container
+                              height: '40px',          // Adjust input height
+                            }
+                          }}
+                          error={!!touched.priority && !!errors.priority}
+                          helperText={touched.priority && errors.priority}
+                          disabled={!isEditing}
+                        />
+                      )}
+                      disabled={!isEditing}
+                      sx={{
+                        gridColumn: "span 1",
+                        '& .MuiAutocomplete-listbox': {  // Target the dropdown list
+                          maxHeight: '200px',           // Set maximum height
+                          padding: 0,                   // Remove default padding
+                          '& .MuiAutocomplete-option': { // Target each option
+                            minHeight: '32px',          // Reduce option height
+                            padding: '4px 16px',        // Adjust padding
+                          }
+                        }
+                      }}
+                      freeSolo
+                      forcePopupIcon
+                      popupIcon={<ArrowDropDownIcon />}
+                    />
                   </Box>
                 ) : (
                   <Box>
-                  <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Priority</Typography>
-                  <Typography sx={{ color: getExperienceColor(values.priority) }}>{values.priority}</Typography>
+                    <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Priority</Typography>
+                    <Typography sx={{ color: getExperienceColor(values.priority) }}>{values.priority}</Typography>
 
-                </Box>
+                  </Box>
                 )}
-            
 
 
-          {isEditing ? (
-                <Box>
-                  <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Status</Typography>
-                  {/* <Typography>{values.status}</Typography> */}
-                        <TextField 
-                        fullWidth 
-                        placeholder="Type your message..." 
-                        size="small"
-                        variant="outlined"
-                        value={values.status}
-                        // onChange={(e) => setNewMessage(e.target.value)}
-                        // onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                      />
-                </Box>
-              ) : (
-                <Box>
-                  <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Status</Typography>
-                  <Typography>{values.status}</Typography>
-                </Box>
-              )}
-        
+
+                {isEditing ? (
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Status</Typography>
+                    {/* <Typography>{values.status}</Typography> */}
+                    <TextField
+                      fullWidth
+                      placeholder="Type your message..."
+                      size="small"
+                      variant="outlined"
+                      value={values.status}
+                    // onChange={(e) => setNewMessage(e.target.value)}
+                    // onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                    />
+                  </Box>
+                ) : (
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Status</Typography>
+                    <Typography>{values.status}</Typography>
+                  </Box>
+                )}
 
 
-                <Box>
-                  <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Impact</Typography>
-                  <Typography>{values.department}</Typography>
-                </Box>
+
+
 
                 <Box>
                   <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Date</Typography>
@@ -273,6 +335,11 @@ const TicketDetails = () => {
                 <Box>
                   <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Experience</Typography>
                   <Typography sx={{ color: getExperienceColor(values.experience) }}>{values.experience}</Typography>
+                </Box>
+
+                <Box>
+                  <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Impact</Typography>
+                  <Typography>{values.department}</Typography>
                 </Box>
 
                 <Box sx={{ gridColumn: { xs: "auto", sm: "span 2", md: "span 3" } }}>
@@ -306,7 +373,7 @@ const TicketDetails = () => {
                   </Box>
 
                   {/* {!isEditing ? ( */}
-                    <Typography sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>{values.requestdetails}</Typography>
+                  <Typography sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>{values.requestdetails}</Typography>
                   {/* ) : (
                     <>
                       <Box sx={{ mt: 2 }}>
@@ -452,7 +519,7 @@ const TicketDetails = () => {
                     Edit
                   </Button> */}
                   {isEditing ? (
-                    <Box sx={{display: "flex", gap: 2}}>
+                    <Box sx={{ display: "flex", gap: 2 }}>
                       <Button
                         variant="contained"
                         onClick={() => setIsEditing(false)}
@@ -541,26 +608,7 @@ const TicketDetails = () => {
         width: isLargeScreen ? "40%" : "100%",
       }}>
         {/* Customer Care Section */}
-        <Box sx={{
-          mt: 2,
-          p: 2,
-          backgroundColor: "#f5f5f5",
-          borderRadius: "8px"
-        }}>
-          <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>Customer Care</Typography>
-          <Typography sx={{ mb: 2 }}>Need help? Contact our support team:</Typography>
-          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-            <Button variant="contained" startIcon={<PhoneIcon />}>
-              Call Support
-            </Button>
-            <Button variant="contained" startIcon={<EmailIcon />}>
-              Email Support
-            </Button>
-            <Button variant="contained" startIcon={<HelpIcon />}>
-              FAQ
-            </Button>
-          </Box>
-        </Box>
+
 
         {/* Customer Chat Section */}
         <Box sx={{
@@ -594,7 +642,7 @@ const TicketDetails = () => {
                     borderRadius: "4px",
                     backgroundColor: message.sender === "user"
                       ? colors.blueAccent[100]
-                      : colors.grey[200],
+                      : "#f0f0f0",
                     maxWidth: "80%",
                     wordWrap: "break-word"
                   }}

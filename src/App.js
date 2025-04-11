@@ -43,6 +43,9 @@ import BsuForm from "./scenes/bsuform";
 import OrganizationForm from "./scenes/organizationform";
 import Login from "./scenes/login";
 import Tasks from "./scenes/tasks";
+import TaskForm from "./scenes/taskform";
+import TaskDetails from "./scenes/taskdetails";
+
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -179,12 +182,14 @@ function App() {
               <Route path="/cmform" element={<CmForm />} />
               <Route path="/crmform" element={<CrmForm />} />
               <Route path="/bsuform" element={<BsuForm />} />
+              <Route path="/taskform" element={<TaskForm />} />
               <Route path="/organizationform" element={<OrganizationForm />} />
               <Route path="/cmdetails" element={<CmDetails />} />
               <Route path="/crmdetails" element={<CrmDetails />} />
               <Route path="/organizationdetails" element={<OrganizationDetails />} />
               <Route path="/hobdetails" element={<HobDetails />} />
               <Route path="/ticketdetails" element={<TicketDetails />} />
+              <Route path="/taskdetails" element={<TaskDetails />} />
               <Route path="/bar" element={<Bar />} />
               <Route path="/pie" element={<Pie />} />
               <Route path="/line" element={<Line />} />

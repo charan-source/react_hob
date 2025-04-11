@@ -25,9 +25,10 @@ const getActivePage = (pathname) => {
     return "/hob";
   } else if (pathname.includes("/notes")) {
     return "/notes";
-  } else if (pathname.includes("/tasks")) {
-      return "/tasks";
-  } else if (pathname.includes("/calendar")) {
+  }else if (pathname.includes("/tasks") || pathname.includes("/taskform") || pathname.includes("/taskdetails")) {
+    return "/tasks";
+  }
+   else if (pathname.includes("/calendar")) {
     return "/calendar";
   }
   else if (pathname.includes("/organization") || pathname.includes("/organizationdetails")) {
@@ -151,6 +152,7 @@ const Sidebar = ({ isSidebar, onLogout }) => {
           selected={selected}
           setSelected={setSelected}
         />
+    
         <Item title="Organization" to="/organization" icon={<BusinessOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Tasks" to="/tasks" icon={<TaskOutlinedIcon />} selected={selected} setSelected={setSelected} />
         <Item title="Notes" to="/notes" icon={<DescriptionOutlinedIcon />} selected={selected} setSelected={setSelected} />
@@ -160,7 +162,7 @@ const Sidebar = ({ isSidebar, onLogout }) => {
                     button
                     onClick={handleLogout}
                     sx={{
-                      // color: colors.blueAccent[500],
+                      color: colors.blueAccent[500],
                       borderRadius: "10px",
                       marginBottom: "8px",
 

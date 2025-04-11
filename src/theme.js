@@ -83,31 +83,92 @@ export const themeSettings = () => {
       },
     },
     typography: {
-      fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
+      fontFamily: [
+        'Poppins',
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"',
+      ].join(','),
       fontSize: 12,
       h1: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
+        fontWeight: 700,
         fontSize: 40,
       },
       h2: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
+        fontWeight: 700,
         fontSize: 32,
       },
       h3: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
+        fontWeight: 600,
         fontSize: 24,
       },
       h4: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
+        fontWeight: 600,
         fontSize: 20,
       },
       h5: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
+        fontWeight: 500,
         fontSize: 16,
       },
       h6: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
+        fontWeight: 500,
         fontSize: 14,
+      },
+      subtitle1: {
+        fontWeight: 500,
+        fontSize: 16,
+      },
+      subtitle2: {
+        fontWeight: 400,
+        fontSize: 14,
+      },
+      body1: {
+        fontWeight: 400,
+        fontSize: 16,
+      },
+      body2: {
+        fontWeight: 400,
+        fontSize: 14,
+      },
+      button: {
+        fontWeight: 500,
+        textTransform: 'none',
+      },
+      caption: {
+        fontWeight: 400,
+      },
+      overline: {
+        fontWeight: 400,
+      },
+    },
+
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: {
+            fontFamily: 'Poppins, sans-serif',
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 500,
+          },
+        },
+      },
+      MuiTypography: {
+        defaultProps: {
+          fontFamily: 'Poppins, sans-serif',
+        },
       },
     },
   };

@@ -31,7 +31,7 @@ const getActivePage = (pathname) => {
     return "/notes";
   } else if (pathname.includes("/calendar")) {
     return "/calendar";
-  } else if (pathname.includes("/tasks")) {
+  }else if (pathname.includes("/tasks") || pathname.includes("/taskform")) {
     return "/tasks";
   } else if (pathname.includes("/organization")) {
     return "/organization";
@@ -117,6 +117,10 @@ const Topbar = ({ onLogout}) => {
         return "Head of the Business";
       case "/tasks":
           return "Tasks List";  
+      case "/taskdetails":
+          return "Task Details";  
+      case "/taskform":
+            return "Create New Task";  
       case "/crmdetails":
         return "Customer Relationship Manager Details";
       case "/cmdetails":
@@ -179,6 +183,10 @@ const Topbar = ({ onLogout}) => {
         return { primaryTitle: "Head of the Business", secondaryTitle: null };
       case "/tasks":
         return { primaryTitle: "Tasks List", secondaryTitle: null };
+      case "/taskform":
+        return { primaryTitle: "Tasks List", secondaryTitle: "Create a New Task" };  
+      case "/taskdetails":
+        return { primaryTitle: "Task Details", secondaryTitle: null };  
       case "/form":
         return { primaryTitle: "Head of the Business", secondaryTitle: "Create a New Head of the Business Unit" };
       case "/hobdetails":
@@ -561,7 +569,7 @@ const Topbar = ({ onLogout}) => {
               <Box sx={{ color: "#ffffff", alignItems: "center", gap: 1, display: "flex" }}>
                 <HomeOutlinedIcon onClick={() => navigate("/")} fontSize="small" sx={{ cursor: "pointer" }} />
                 <CustomDivider />
-                <Typography sx={{ cursor: "pointer", fontSize:"14px" }} onClick={() => navigate(-1)}>
+                <Typography sx={{ cursor: "pointer", fontSize:"14px" }} onClick={ secondaryTitle ? () => navigate(-1) : undefined}>
                   {primaryTitle}
                 </Typography>
                 {secondaryTitle && (

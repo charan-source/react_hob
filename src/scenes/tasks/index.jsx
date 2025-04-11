@@ -1,372 +1,274 @@
-import { Box, Typography, List, ListItem, ListItemText, useMediaQuery, TextField, Button, Modal } from "@mui/material";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputBase,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { Search as SearchIcon } from "@mui/icons-material";
-import { Formik } from "formik";
-import * as yup from "yup";
-// import { useNavigate } from "react-router-dom";
+import {
+  Search as SearchIcon,
+  Add as AddIcon,
+  Check as CheckIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+// import { date } from "yup";
+
+const initialTickets = [
+  { id: 1, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket", taskid : "1", date:"03-04-2025", time: "10:00 AM" },
+  { id: 2, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket",   taskid : "2", date:"03-04-2025", time: "10:00 AM" },
+  { id: 3, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket",   taskid : "3", date:"03-04-2025", time: "10:00 AM" },
+  { id: 4, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket",  taskid : "4", date:"03-04-2025", time: "10:00 AM" },
+  { id: 5, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket",  taskid : "5", date:"03-04-2025", time: "10:00 AM" },
+  { id: 6, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket",  taskid : "6", date:"03-04-2025", time: "10:00 AM" },
+  { id: 7, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket",  taskid : "7", date:"03-04-2025", time: "10:00 AM" },
+  { id: 8, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket", taskid : "8", date:"03-04-2025", time: "10:00 AM" },
+  { id: 9, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket",   taskid : "9", date:"03-04-2025", time: "10:00 AM" },
+
+];
 
 const Tasks = () => {
-  // Responsive breakpoints
-  const isDesktop = useMediaQuery("(min-width: 1024px)"); // Desktop (5 columns)
-  const isTablet = useMediaQuery("(min-width: 768px)"); // Tablet (3 columns)
-  //  const navigate = useNavigate();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 600px)");
-  const colors = tokens("light");
-  const [openModal, setOpenModal] = useState(false);
-  const [openTaskModal, setTaskopenModal] = useState(false);
-  const [name, setName] = useState("");
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const formRefs = useRef([]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  // const handleOpenModal = () => {
-  //   setOpenModal(true);
-  // };
-  const handletaskmodel = () => {
-    setTaskopenModal(true);
+  const handleNewTicket = () => {
+    navigate('/taskform');
   };
 
-  const handleRemoveForm = (id) => {
-    setFormInstances(formInstances.filter((form) => form.id !== id));
+  const handleRowClick = (params) => {
+    navigate('/taskdetails', { state: { ticket: params.row } });
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setName(""); // Reset input field
+  const handleCompleteTask = (id) => (event) => {
+    event.stopPropagation();
+    console.log("Task completed:", id);
+    // Add your complete task logic here
   };
 
-  const handleTaskCloseModal = () => {
-    setTaskopenModal(false);
-    setName(""); // Reset input field
+  const handleDeleteTask = (id) => (event) => {
+    event.stopPropagation();
+    console.log("Task deleted:", id);
+    // Add your delete task logic here
   };
 
-  const [formInstances, setFormInstances] = useState([{ 
-    id: 1,
-    selectedCountry: null,
-    selectedState: null,
-    selectedCity: null
-  }]);
+  // Columns for DataGrid
+  const columns = [
+    { field: "id", headerName: "ID", flex: 0.4, headerClassName: "bold-header", disableColumnMenu: false, minWidth: 100 },
+    { field: "ticketraise", headerName: "Task name", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 200 },
+    { field: "name", headerName: "Task owner", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 150 },
+    { field: "status", headerName: "Status", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 150 },
+    { 
+      field: "actions", 
+      headerName: "Action", 
+      flex: 1, 
+      headerClassName: "bold-header", 
+      disableColumnMenu: true, 
+      minWidth: 150,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <IconButton 
+            onClick={handleCompleteTask(params.id)}
+            sx={{ color: "#ffffff", backgroundColor: "#0BDA51",  width: "30px", height: "30px"  }}
+            aria-label="complete"
+            disableRipple
+          >
+            <CheckIcon />
+          </IconButton>
+          <IconButton 
+            onClick={handleDeleteTask(params.id)}
+            sx={{ color: "#ffffff", backgroundColor: "#FF2C2C", width: "30px", height: "30px" }}
+            disableRipple
+            aria-label="delete"
 
-  const handleAddForm = () => {
-    setFormInstances([...formInstances, { 
-      id: formInstances.length + 1,
-    }]);
-  };
-  
-  const handleFormSubmit = (values) => {
-    console.log("Form Data:", values);
-    // Add your form submission logic here
-    alert('Form submitted successfully!');
-  };
-
-  const initialValues = {
-    organization: "",
-    founderName: "",
-    email: "",
-    phoneCode: "",
-    phoneno: "",
-    address: "",
-    city: "",
-    province: "",
-    country: "",
-    postcode: "",
-    branch: "",
-  };
-
-  const checkoutSchema = yup.object().shape({
-    organization: yup.string().required("Required"),
-    email: yup.string().email("Invalid email").required("Required"),
-    phoneCode: yup.string().required("Required"),
-    phoneno: yup.string().required("Required"),
-    address: yup.string().required("Required"),
-    city: yup.string().required("Required"),
-    province: yup.string().required("Required"),
-    country: yup.string().required("Required"),
-    postalcode: yup.string().required("Required"),
-    branch: yup.string(),
-  });
-
-  const handleSubmit = () => {
-    console.log("Submitted Name:", name);
-    handleCloseModal();
-  };
-
-  const StyledTextField = ({ label, name, value, handleChange, handleBlur, error, multiline = false, rows = 1 }) => {
-    return (
-      <TextField
-        fullWidth
-        variant="outlined"
-        label={label}
-        name={name}
-        value={value}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        error={!!error}
-        helperText={error}
-        multiline={multiline}
-        rows={rows}
-        sx={{ marginBottom: "15px" }}
-      />
-    );
-  };
-
-  // Dynamic columns based on screen size
-  const columns = isDesktop ? 5 : isTablet ? 3 : 1;
-
-  const sections = [
-    { title: "Aliquam ut iste est aperiam quis.", text: "Inventore ut dolor illum quidem corporis..." },
-    { title: "Autem aliquam occaecati voluptatibus...", text: "Dicta voluptas dolor ut labore ture culpa..." },
-    { title: "Dolores aut atque deserunt blanditiis...", text: "Id amet inventore eius labore exercitationem..." },
-    { title: "Et at rem nobis assumenda rem non...", text: "Quia autem occaecati dolores et id explicabo..." },
-    { title: "Magni accusantium iusto neque et rerum...", text: "Laborum et vitae deserunt voluptas..." },
-    { title: "15th March, 2025", isDate: true },
-    { title: "Necessitatibus sed officiis rerum omnis...", text: "Quia tempore corporis tempora asperiores..." },
-    { title: "Qui rem dolores veniam vero qui.", text: "Impedit impedit necessitatibus quis ad..." },
-    { title: "Quod eum dolore facilis optio modi...", text: "Est corporis explicabo necessitatibus..." },
-    { title: "15th March, 2025", isDate: true },
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      ),
+      sortable: false,
+      filterable: false,
+    },
   ];
 
   return (
-    <Box sx={{ padding: 3 }}>
-      {isMobile ? (
-        <Box display="flex" flexDirection="column" justifyContent="space-between" alignItems="center" p={3} gap={2}>
-          <TextField
-            variant="outlined"
-            placeholder="Search..."
-            size="small"
-            sx={{
-              background: "#ffffff",
-              flexGrow: 1,
-              minWidth: "50px",
-              maxWidth: "600px",
-              padding: "5px 20px",
-              borderRadius: "8px",
-              "& fieldset": { border: "none" },
-            }}
-            value={searchTerm}
-            onChange={handleSearchChange}
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ color: "action.active" }} />,
-            }}
-          />
-
-          <Button
-            variant="contained"
-            sx={{
-              background: colors.blueAccent[500],
-              color: "#ffffff",
-              width: "70%",
-              height: "45px",
-              borderRadius: "4px",
-              fontSize: "14px",
-              fontWeight: "bold",
-              textTransform: "none",
-            }}
-            onClick={handletaskmodel}
-          >
-            Create New Task
-          </Button>
+    <Box m="10px">
+      {/* Toolbar */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={2} flexDirection={isMobile ? "column" : "row"}>
+        {/* Search Bar */}
+        <Box display="flex" backgroundColor="#ffffff" borderRadius="3px" flex={1}>
+          <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" value={searchTerm} onChange={handleSearchChange} />
+          <IconButton type="button" sx={{ p: 1 }}>
+            <SearchIcon />
+          </IconButton>
         </Box>
-      ) : (
-        <Box display="flex" justifyContent="center" alignItems="center" p={3} gap={2}>
-          <TextField
-            variant="outlined"
-            placeholder="Search..."
-            size="small"
-            sx={{
-              background: "#ffffff",
-              flexGrow: 1,
-              minWidth: "100px",
-              maxWidth: "600px",
-              padding: "5px 20px",
-              borderRadius: "8px",
-              "& fieldset": { border: "none" },
-            }}
-            value={searchTerm}
-            onChange={handleSearchChange}
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ color: "action.active", mr: 1 }} />,
-            }}
-          />
 
-          <Button
-            variant="contained"
-            sx={{
-              background: colors.blueAccent[500],
-              color: "#ffffff",
-              width: "15%",
-              height: "45px",
-              borderRadius: "4px",
-              fontSize: "14px",
-              fontWeight: "bold",
-              textTransform: "none",
-            }}
-            onClick={handletaskmodel}
-          >
-            Create New Task
-          </Button>
-        </Box>
-      )}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${columns}, 1fr)`,
-          gap: 2,
-        }}
-      >
-        {sections.map((section, index) => (
-          <Box key={index} sx={{ padding: 2, backgroundColor: "#f9f9f9", borderRadius: 2, display:"flex", flexDirection:"column", justifyContent:"space-between" }}>
-            <Box>
-              <Typography sx={{ fontWeight: "bold", marginBottom: 1, fontSize:"16px" }}>
-                {section.title}
-              </Typography>
-              <Typography sx={{ marginBottom: 2, fontWeight:"14px" }}>
-                {section.text}
-              </Typography>
-            </Box>
-            {section.isDate ? (
-              <List>
-                {["15th March, 2025", "15th March, 2025"].map((text, i) => (
-                  <ListItem button key={i}>
-                    <ListItemText primary={text} />
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Typography variant="body1" sx={{ color: "text.secondary" }}>
-                15th March, 2025", "15th March, 2025
-              </Typography>
-            )}
-          </Box>
-        ))}
+        <Button
+          variant="contained"
+          sx={{
+            background: colors.blueAccent[500],
+            fontWeight: "bold",
+            color: "#ffffff",
+            whiteSpace: "nowrap",
+            textTransform: "none"
+          }}
+          startIcon={<AddIcon />}
+          onClick={handleNewTicket}
+        >
+          Create New
+        </Button>
       </Box>
 
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "8px",
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Enter Name
-          </Typography>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            sx={{ mb: 3 }}
-          />
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Description
-          </Typography>
-          <StyledTextField
-            name="experienceDetails"
-            multiline
-            rows={4}
-          />
-          <Box display="flex" justifyContent="flex-start" gap={3}>
-            <Button variant="contained" onClick={handleSubmit} sx={{backgroundColor:colors.blueAccent[700], color:"#ffffff", fontSize:"14px", padding:"8px 32px"}} >
-              Submit
-            </Button>
-            <Button onClick={handleCloseModal} sx={{fontSize:"14px", padding:"8px 32px", backgroundColor:"#475569", color:"#ffffff"}}>
-              Cancel
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-
-      <Modal open={openTaskModal} onClose={handleTaskCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "8px",
-          }}
-        >
-          {formInstances.map((instance, index) => (
-            <Formik
-              key={instance.id}
-              initialValues={initialValues}
-              validationSchema={checkoutSchema}
-              onSubmit={handleFormSubmit}
-              innerRef={(ref) => (formRefs.current[index] = ref)}
-            >
-              {({ handleSubmit }) => (
-                <Box>
-                  <Typography variant="h6" sx={{}}>
-                    Task {instance.id}
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    label={`Task ${instance.id}`}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    sx={{ mb: 1 }}
-                  />
-                  {index > 0 && (
-                    <Box display="flex" justifyContent="flex-start" mb={2} >
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        onClick={() => handleRemoveForm(instance.id)}
-                        sx={{ 
-                          textTransform: "none",
-                          padding: "4px 8px",
-                          fontSize: "0.75rem"
-                        }}
-                      >
-                        Remove Task
-                      </Button>
-                    </Box>
-                  )}
-                </Box>
-              )}
-            </Formik>
-          ))}
-          <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={handleAddForm} 
-            sx={{ 
-              textTransform: "none",
-              padding: "8px 16px",
-              mt: 2
-            }}
-          >
-            + Add Task
-          </Button>
-          <Box display="flex" justifyContent="flex-start" gap={3} mt={2}>
-            <Button variant="contained" onClick={handleFormSubmit} sx={{backgroundColor:colors.blueAccent[700], color:"#ffffff", fontSize:"14px", padding:"8px 32px"}} >
-              Submit
-            </Button>
-            <Button onClick={handleTaskCloseModal} sx={{fontSize:"14px", padding:"8px 32px", backgroundColor:"#475569", color:"#ffffff"}}>
-              Cancel
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
+      {/* DataGrid */}
+      <Box height="70vh" m="13px 0 0 0" sx={{
+        "& .MuiDataGrid-cell": {
+          borderBottom: "none",
+          fontSize: "16px",
+          whiteSpace: "nowrap",
+          overflow: "visible",
+        },
+        "& .MuiDataGrid-columnHeaders": {
+          backgroundColor: colors.blueAccent[700],
+          borderBottom: "none",
+          fontWeight: "bold !important",
+          fontSize: "16px !important",
+          color: "#ffffff",
+        },
+        "& .MuiDataGrid-columnSeparator": {
+          display: "none",
+        },
+        "& .MuiDataGrid-columnHeaderTitle": {
+          fontWeight: "bold !important",
+        },
+        "& .MuiDataGrid-virtualScroller": {
+          backgroundColor: "#ffffff",
+        },
+        "& .MuiDataGrid-root::-webkit-scrollbar": {
+          display: "none !important",
+        },
+        "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+          display: "none !important",
+        },
+        "& .MuiDataGrid-root": {
+          "&:hover": {
+            cursor: "pointer",
+            backgroundColor:"#D9EAFD"
+          },
+        },
+        "& .MuiDataGrid-row": {
+          borderBottom: `0.5px solid ${colors.grey[300]}`,
+          "&:hover": {
+            cursor: "pointer",
+            backgroundColor:"#D9EAFD"
+          },
+        },
+        "& .MuiTablePagination-root": {
+          color: "#ffffff !important",
+        },
+        "& .MuiTablePagination-selectLabel, & .MuiTablePagination-input": {
+          color: "#ffffff !important",
+        },
+        "& .MuiTablePagination-displayedRows": {
+          color: "#ffffff !important",
+        },
+        "& .MuiSvgIcon-root": {
+          color: "#ffffff !important",
+        },
+        "& .MuiDataGrid-footerContainer": {
+          borderTop: "none",
+          backgroundColor: colors.blueAccent[700],
+          color: "#ffffff",
+        },
+      }}>
+        <DataGrid
+         sx={{
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none",
+            fontSize: "16px",
+            whiteSpace: "nowrap", // Prevent text wrapping
+            overflow: "visible", // Prevent text truncation
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: colors.blueAccent[700],
+            borderBottom: "none", // Remove the border below the header
+            fontWeight: "bold !important",
+            fontSize: "16px !important",
+            color: "#ffffff",
+          },
+          // "& .MuiDataGrid-root::-webkit-scrollbar-thumb":{
+          //    width: "2px !important",
+          //    height: "6px !important"
+          //  },
+          "& .MuiDataGrid-columnSeparator": {
+            display: "none", // Hide the column separator
+          },
+          // "& .MuiDataGrid-root::-webkit-scrollbar": {
+          //   display: "none", // Hides scrollbar in Chrome, Safari
+          // },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold !important", // Ensure header text is bold
+          },
+          // "& .MuiDataGrid-virtualScroller": {
+          //   backgroundColor: "#ffffff",
+          // },
+          "& .MuiDataGrid-root::-webkit-scrollbar": {
+            display: "none !important",
+          },
+          "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+            display: "none !important",
+          },
+          "& .MuiDataGrid-root": {
+            // scrollbarWidth: "none !important", // Hides scrollbar in Firefox
+            "&:hover": {
+              cursor: "pointer",
+              backgroundColor:"#D9EAFD"
+            },
+          },
+          "& .MuiDataGrid-virtualScroller": {
+            // scrollbarWidth: "none !important",
+            backgroundColor: "#ffffff",
+          },
+          "& .MuiDataGrid-row": {
+            borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
+            "&:hover": {
+              cursor: "pointer",
+              backgroundColor:"#D9EAFD"
+            },
+          },
+          "& .MuiTablePagination-root": {
+            color: "#ffffff !important", // Ensure pagination text is white
+          },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-input": {
+            color: "#ffffff !important", // Ensure select label and input text are white
+          },
+          "& .MuiTablePagination-displayedRows": {
+            color: "#ffffff !important", // Ensure displayed rows text is white
+          },
+          "& .MuiSvgIcon-root": {
+            color: "#ffffff !important", // Ensure pagination icons are white
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "none",
+            backgroundColor: colors.blueAccent[700],
+            color: "#ffffff",
+          },
+        }}
+          rows={initialTickets}
+          columns={columns}
+          pageSize={10}
+          onRowClick={handleRowClick}
+        />
+      </Box>
     </Box>
   );
 };

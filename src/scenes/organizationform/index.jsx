@@ -117,7 +117,7 @@ const OrganizationForm = () => {
           >
             {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
               <form onSubmit={handleSubmit} style={{ marginBottom: "20px", borderBottom: "2px solid #ddd", paddingBottom: "20px" }}>
-                <h3>Branch {index + 1}</h3>
+                <h3> {index === 0 ? "Parent Company" : `Branch ${index}`}</h3>
                 <Box
                   display="grid"
                   gap="20px"
@@ -164,6 +164,20 @@ const OrganizationForm = () => {
                     onBlur={handleBlur}
                     error={!!touched.email && !!errors.email}
                     helperText={touched.email && errors.email}
+                    sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                  />
+
+
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Branch"
+                    name="email"
+                    value={values.branch}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={!!touched.branch && !!errors.branch}
+                    helperText={touched.branch && errors.branch}
                     sx={{ ...textFieldStyles, gridColumn: "span 1" }}
                   />
 

@@ -2,9 +2,12 @@ import { Box, Button, TextField, useMediaQuery, useTheme, Autocomplete, Typograp
 import { tokens } from "../../theme";
 import { Formik } from "formik";
 import * as yup from "yup";
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState,  useMemo, useRef } from 'react';
 import { Country, State, City } from 'country-state-city';
 import { useLocation } from 'react-router-dom';
+
+
+
 
 const OrganizationDetails = () => {
   const theme = useTheme();
@@ -165,10 +168,11 @@ const OrganizationDetails = () => {
         innerRef={ref => formRefs.current[id] = ref}
       >
         {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
-          <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4, p: 3, border: '1px solid #eee', borderRadius: '8px' }}>
-            <Typography variant="h6" gutterBottom>
-              {id === 1 ? "Main Organization" : `Branch ${id - 1}`}
-            </Typography>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4, p: 3, borderRadius: '8px',  borderBottom: "2px solid #ddd" }}>
+            {/* <Typography variant="h6" gutterBottom> */}
+              {/* {id === 1 ? "Parent Company" : `Branch ${id - 1}`} */}
+              <h3> {id === 1 ? "Parent Company" : `Branch ${id - 1}`}</h3>
+            {/* </Typography> */}
 
             <Box
               display="grid"

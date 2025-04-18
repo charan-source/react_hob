@@ -1,30 +1,59 @@
-import { Box, useMediaQuery, Typography, Button, useTheme, TextField, Autocomplete } from "@mui/material";
+import { Box, useMediaQuery, Typography, Button, useTheme, TextField, Autocomplete, IconButton, Modal } from "@mui/material";
 import { Formik } from "formik";
 import { tokens } from "../../theme";
 import * as yup from "yup";
 import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import download from 'downloadjs';
-import JoditEditor from 'jodit-react';
-// import {Jodit} from 'jodit-pro';
-import 'jodit-pro/es5/jodit.min.css';
+import { DataGrid } from "@mui/x-data-grid";
+import {
+  FormatBold, FormatItalic, FormatUnderlined,
+  FormatListNumbered, FormatListBulleted,
+  InsertPhoto, TableChart, YouTube,
+  Check as CheckIcon,
+  Delete as DeleteIcon,
+  Add as AddIcon,
+} from '@mui/icons-material';
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Image from '@tiptap/extension-image'
+import Table from '@tiptap/extension-table'
+import TableRow from '@tiptap/extension-table-row'
+import TableHeader from '@tiptap/extension-table-header'
+import TableCell from '@tiptap/extension-table-cell'
+import Youtube from '@tiptap/extension-youtube'
+import { Underline } from '@tiptap/extension-underline';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-// import { Block } from "@mui/icons-material";
-// import PhoneIcon from '@mui/icons-material/Phone';
-// import EmailIcon from '@mui/icons-material/Email';
-// import HelpIcon from '@mui/icons-material/Help';
+import { useNavigate } from "react-router-dom";
+
+
+
+const initialTickets = [
+  { id: 1, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a task 1", taskid: "1", date: "03-04-2025", time: "10:00 AM" },
+  { id: 2, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a task 2", taskid: "2", date: "03-04-2025", time: "10:00 AM" },
+  { id: 3, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a task 3", taskid: "3", date: "03-04-2025", time: "10:00 AM" },
+  { id: 4, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a task 4", taskid: "4", date: "03-04-2025", time: "10:00 AM" },
+  { id: 5, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket", taskid: "5", date: "03-04-2025", time: "10:00 AM" },
+  // { id: 6, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket", taskid: "6", date: "03-04-2025", time: "10:00 AM" },
+  // { id: 7, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket", taskid: "7", date: "03-04-2025", time: "10:00 AM" },
+  // { id: 8, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket", taskid: "8", date: "03-04-2025", time: "10:00 AM" },
+  // { id: 9, name: "Charan Palemala", status: "Pending", description: "this is not available", priority: "Urgent", ticketraise: "create a ticket", taskid: "9", date: "03-04-2025", time: "10:00 AM" },
+
+];
 
 const TicketDetails = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery("(min-width:600px)");
-  // const isMobile = useMediaQuery("(max-width:600px)");
-  const isLargeScreen = useMediaQuery("(min-width:800px)");
+  const isMobile = useMediaQuery("(max-width:484px)");
+  const colors = tokens(theme.palette.mode);
   const location = useLocation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const colors = tokens(theme.palette.mode);
-
+  // const [isEditingsection2, setIsEditingsection2] = useState(false);
+  const navigate = useNavigate();
+  const [openTaskModal, setOpenTaskModal] = useState(false);
+  const [shareEntireExperience, setshareEntireExperience] = useState(false);
   const ticket = useMemo(() => location.state?.ticket || {}, [location.state]);
 
   const getExperienceColor = (experience) => {
@@ -41,6 +70,45 @@ const TicketDetails = () => {
     const fullPhoneNumber = `${values.phoneCode}${values.PhoneNo}`;
     console.log("Form Data:", { ...values, fullPhoneNumber });
   };
+
+
+  const columns = [
+    { field: "id", headerName: "ID", flex: 0.4, headerClassName: "bold-header", disableColumnMenu: false, minWidth: 100 },
+    { field: "ticketraise", headerName: "Task name", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 200 },
+    { field: "name", headerName: "Task owner", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 150 },
+    { field: "status", headerName: "Status", flex: 1, headerClassName: "bold-header", disableColumnMenu: true, minWidth: 150 },
+    {
+      field: "actions",
+      headerName: "Action",
+      flex: 1,
+      headerClassName: "bold-header",
+      disableColumnMenu: true,
+      minWidth: 150,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <IconButton
+            onClick={handleCompleteTask(params.id)}
+            sx={{ color: "#ffffff", backgroundColor: "#0BDA51", width: "30px", height: "30px" }}
+            aria-label="complete"
+            disableRipple
+          >
+            <CheckIcon />
+          </IconButton>
+          <IconButton
+            onClick={handleDeleteTask(params.id)}
+            sx={{ color: "#ffffff", backgroundColor: "#FF2C2C", width: "30px", height: "30px" }}
+            disableRipple
+            aria-label="delete"
+
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      ),
+      sortable: false,
+      filterable: false,
+    },
+  ];
 
   const initialValues = {
     organization: ticket.organization || "",
@@ -103,32 +171,477 @@ const TicketDetails = () => {
     }
   };
 
-  // const config = {
-  //   readonly: false,
-  //   buttons: ['bold', 'italic', 'underline', 'strikethrough', '|', 'ul', 'ol', '|', 'link'],
-  // };
-
-  // Add these state variables at the top of your component
   const [messages, setMessages] = useState([
     { text: "Hello! How can I help you today?", sender: "support" }
   ]);
   const [newMessage, setNewMessage] = useState("");
 
-  // Add this function to handle sending messages
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline, // Add this line
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+      }),
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      Youtube,
+    ],
+    content: newMessage,
+    onUpdate: ({ editor }) => {
+      setNewMessage(editor.getHTML());
+    },
+  });
+
+  const addImage = () => {
+    const url = window.prompt('Enter the URL of the image:');
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  const addYoutubeVideo = () => {
+    const url = window.prompt('Enter YouTube URL:');
+    if (url) {
+      editor.commands.setYoutubeVideo({
+        src: url,
+        width: 640,
+        height: 480,
+      });
+    }
+  };
+
+  const addTable = () => {
+    editor.chain().focus().insertTable({
+      rows: 3,
+      cols: 3,
+      withHeaderRow: true
+    }).run();
+  };
+
   const handleSendMessage = () => {
-    if (newMessage.trim() === "") return;
+    if (!newMessage.trim()) return;
 
-    // Add user message
-    setMessages(prev => [...prev, { text: newMessage, sender: "user" }]);
+    setMessages(prev => [...prev, {
+      text: newMessage,
+      sender: "user"
+    }]);
     setNewMessage("");
+    editor.commands.clearContent();
 
-    // Simulate bot response after a short delay
     setTimeout(() => {
       setMessages(prev => [...prev, {
-        text: "Thanks for your message! Our team will get back to you soon.",
+        text: "We've received your message with attachments!",
         sender: "support"
       }]);
     }, 1000);
+  };
+
+  const createtaskmodel = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: isDesktop ? '60%' : '90%',
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: '8px',
+    maxHeight: '90vh',
+    overflowY: 'auto'
+  };
+
+
+
+
+  const assignmodel = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: isDesktop ? '40%' : '90%',
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: '8px',
+    maxHeight: '90vh',
+    overflowY: 'auto'
+  };
+
+
+  const handleRowClick = (params) => {
+    navigate('/taskdetails', { state: { ticket: params.row } });
+  };
+
+  const handleCompleteTask = (id) => (event) => {
+    event.stopPropagation();
+    console.log("Task completed:", id);
+    // Add your complete task logic here
+  };
+
+  const handleDeleteTask = (id) => (event) => {
+    event.stopPropagation();
+    console.log("Task deleted:", id);
+    // Add your delete task logic here
+  };
+
+
+  const TaskForm = ({ handleClose }) => {
+    const theme = useTheme();
+    const isNonMobile = useMediaQuery("(max-width:600px)");
+    const colors = tokens(theme.palette.mode);
+
+    const handleFormSubmit = (values) => {
+      console.log("Form Data:", values);
+      alert('Task created successfully!');
+      handleClose();
+    };
+
+    const initialValues = {
+      taskname: "",
+      taskowner: "",
+      description: "",
+      priority: "",
+    };
+
+    const checkoutSchema = yup.object().shape({
+      taskname: yup.string().required("Required"),
+      taskowner: yup.string().required("Required"),
+      description: yup.string().required("Required"),
+      priority: yup.string().required("Required"),
+    });
+
+    // const textFieldStyles = {
+    //   "& .MuiOutlinedInput-root": {
+    //     borderRadius: "8px",
+    //     border: "1px solid #ccc",
+    //     backgroundColor: "#ffffff",
+    //     boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+    //     "&:hover": {
+    //       borderColor: "#999",
+    //       boxShadow: "4px 4px 8px rgba(0, 0, 0, 0.15)",
+    //     },
+    //     padding: "8px 12px",
+    //     height: "50px",
+    //   },
+    //   "& .MuiInputLabel-root": {
+    //     color: "#555",
+    //   },
+    //   "& .MuiOutlinedInput-notchedOutline": {
+    //     border: "none",
+    //   },
+    // };
+
+    const priorityOptions = ["Urgent", "High", "Low"];
+
+
+
+    // Columns for DataGrid
+
+
+    return (
+      <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px" }}>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={checkoutSchema}
+          onSubmit={handleFormSubmit}
+        >
+          {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
+            <form onSubmit={handleSubmit}>
+              <Box
+                display="grid"
+                gap="20px"
+                gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))"}
+                sx={{
+                  "& > div": { gridColumn: isNonMobile ? "span 1" : undefined },
+                  backgroundColor: "#ffffff",
+                  marginTop: "20px"
+                }}
+              >
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Task Name"
+                  name="taskname"
+                  value={values.taskname}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.taskname && !!errors.taskname}
+                  helperText={touched.taskname && errors.taskname}
+                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                />
+
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Task Owner"
+                  name="taskowner"
+                  value={values.taskowner}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.taskowner && !!errors.taskowner}
+                  helperText={touched.taskowner && errors.taskowner}
+                  sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                />
+
+                <Autocomplete
+                  fullWidth
+                  options={priorityOptions}
+                  value={values.priority || null}
+                  onChange={(event, newValue) => {
+                    setFieldValue("priority", newValue || "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Priority"
+                      sx={textFieldStyles}
+                      error={!!touched.priority && !!errors.priority}
+                      helperText={touched.priority && errors.priority}
+                    />
+                  )}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiAutocomplete-listbox': {
+                      maxHeight: '200px',
+                      padding: 0,
+                      '& .MuiAutocomplete-option': {
+                        minHeight: '32px',
+                        padding: '4px 16px',
+                      }
+                    }
+                  }}
+                  freeSolo
+                  forcePopupIcon
+                  popupIcon={<ArrowDropDownIcon />}
+                />
+
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Description"
+                  name="description"
+                  value={values.description}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.description && !!errors.description}
+                  helperText={touched.description && errors.description}
+                  multiline
+                  rows={4}
+                  sx={{
+                    ...textFieldStyles,
+                    gridColumn: "span 3",
+                    "& .MuiOutlinedInput-root": {
+                      ...textFieldStyles["& .MuiOutlinedInput-root"],
+                      height: "auto",
+                      minHeight: "120px",
+                      alignItems: "flex-start"
+                    }
+                  }}
+                />
+              </Box>
+
+              <Box display="flex" justifyContent="flex-end" mt="20px" gap={2}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    padding: "12px 24px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    borderRadius: "8px",
+                    boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                    transition: "0.3s",
+                    backgroundColor: colors.blueAccent[700],
+                    color: "#ffffff",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: colors.blueAccent[600],
+                      boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)"
+                    },
+                  }}
+                >
+                  Create Task
+                </Button>
+              </Box>
+            </form>
+          )}
+        </Formik>
+      </Box>
+    );
+  };
+
+
+
+
+
+
+
+// Assign to Customer Relationship Manager
+
+
+const AssignCrm = ({ handleClose }) => {
+  const theme = useTheme();
+  const isNonMobile = useMediaQuery("(max-width:600px)");
+  const colors = tokens(theme.palette.mode);
+
+  const handleFormSubmit = (values) => {
+    console.log("Form Data:", values);
+    alert('Task created successfully!');
+    handleClose();
+  };
+
+  const initialValues = {
+    crmids: "",
+    crmname: "",
+
+  };
+
+  const checkoutSchema = yup.object().shape({
+    crmids: yup.string().required("Required"),
+    crmname: yup.string().required("Required"),
+
+  });
+
+
+  const crmids = ["123456", "123456", "123456", "123456", "123456"];
+
+
+
+  // Columns for DataGrid
+
+
+  return (
+    <Box m="15px" sx={{ backgroundColor: "#ffffff", padding: "20px" }}>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={checkoutSchema}
+        onSubmit={handleFormSubmit}
+      >
+        {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
+          <form onSubmit={handleSubmit}>
+            <Box
+              display="grid"
+              gap="20px"
+              gridTemplateColumns={isNonMobile ? "repeat(1, minmax(0, 1fr))" : "repeat(1, minmax(0, 1fr))"}
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? "span 1" : undefined },
+                backgroundColor: "#ffffff",
+                marginTop: "20px"
+              }}
+            >
+
+
+
+              <Autocomplete
+                fullWidth
+                options={crmids}
+                value={values.crmids || null}
+                onChange={(event, newValue) => {
+                  setFieldValue("priority", newValue || "");
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select CRM ID"
+                    sx={textFieldStyles}
+                    error={!!touched.crmids && !!errors.crmids}
+                    helperText={touched.crmids && errors.crmids}
+                  />
+                )}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiAutocomplete-listbox': {
+                    maxHeight: '200px',
+                    padding: 0,
+                    '& .MuiAutocomplete-option': {
+                      minHeight: '32px',
+                      padding: '4px 16px',
+                    }
+                  }
+                }}
+                freeSolo
+                forcePopupIcon
+                popupIcon={<ArrowDropDownIcon />}
+              />
+
+           <TextField
+                fullWidth
+                variant="outlined"
+                label="CRM Name"
+                name="crmname"
+                value={values.crmname}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={!!touched.crmname && !!errors.crmname}
+                helperText={touched.crmname && errors.crmname}
+                sx={{ ...textFieldStyles, gridColumn: "span 1" }}
+                disabled
+              />
+
+
+            </Box>
+
+            <Box display="flex" justifyContent="flex-end" mt="20px" gap={2}>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  padding: "12px 24px",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                  transition: "0.3s",
+                  backgroundColor: colors.blueAccent[700],
+                  color: "#ffffff",
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: colors.blueAccent[600],
+                    boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)"
+                  },
+                }}
+              >
+                Assign
+              </Button>
+            </Box>
+          </form>
+        )}
+      </Formik>
+    </Box>
+  );
+};
+
+
+
+
+
+
+
+  const textFieldStyles = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "8px",
+      border: "1px solid #ccc",
+      backgroundColor: "#ffffff",
+      boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
+      "&:hover": {
+        borderColor: "#999",
+        boxShadow: "4px 4px 8px rgba(0, 0, 0, 0.15)",
+      },
+      padding: "8px 12px",
+      height: "50px",
+    },
+    "& .MuiInputLabel-root": {
+      color: "#555",
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      border: "none",
+    },
   };
 
   const customerManagers = [
@@ -139,30 +652,42 @@ const TicketDetails = () => {
     "Ram",
   ];
 
-
   const priority = [
     "Urgent",
     "High",
     "Low",
   ];
+
+  const status = [
+    "Pending",
+    "Processing",
+    "Closed",
+  ];
+
   return (
     <Box sx={{
-      display: "flex",
-      flexDirection: isLargeScreen ? "row" : "column",
-      gap: 2,
-      p: isDesktop ? 3 : 2
+      display: 'grid',
+      gridTemplateColumns: {
+        xs: '1fr',
+        md: 'repeat(2, 1fr)'
+      },
+      gap: 3,
+      p: 2,
+      maxWidth: '100%',
+      overflow: 'hidden'
     }}>
       {/* First Column - Ticket Details */}
       <Box sx={{
         backgroundColor: "#ffffff",
         p: isDesktop ? 3 : 2,
         borderRadius: "8px",
-        flex: 1,
-        maxWidth: isLargeScreen ? "60%" : "100%",
-        width: isLargeScreen ? "60%" : "100%"
+        gridColumn: {
+          xs: '1 / -1',
+          md: '1 / 2'
+        }
       }}>
         <Formik initialValues={initialValues} validationSchema={checkoutSchema} onSubmit={handleFormSubmit}>
-          {({ values, setFieldValue, touched, errors }) => (
+          {({ values, setFieldValue, touched, errors, handleBlur, handleChange }) => (
             <form>
               <Box
                 display="grid"
@@ -211,8 +736,8 @@ const TicketDetails = () => {
                           {...params}
                           sx={{
                             display: isEditing ? "block" : "none",
-                            '& .MuiInputBase-root': {  // Target the input container
-                              height: '40px',          // Adjust input height
+                            '& .MuiInputBase-root': {
+                              height: '40px',
                             }
                           }}
                           error={!!touched.crmname && !!errors.crmname}
@@ -223,12 +748,12 @@ const TicketDetails = () => {
                       disabled={!isEditing}
                       sx={{
                         gridColumn: "span 1",
-                        '& .MuiAutocomplete-listbox': {  // Target the dropdown list
-                          maxHeight: '200px',           // Set maximum height
-                          padding: 0,                   // Remove default padding
-                          '& .MuiAutocomplete-option': { // Target each option
-                            minHeight: '32px',          // Reduce option height
-                            padding: '4px 16px',        // Adjust padding
+                        '& .MuiAutocomplete-listbox': {
+                          maxHeight: '200px',
+                          padding: 0,
+                          '& .MuiAutocomplete-option': {
+                            minHeight: '32px',
+                            padding: '4px 16px',
                           }
                         }
                       }}
@@ -238,11 +763,12 @@ const TicketDetails = () => {
                     />
                   </Box>
                 ) : (
-                  <Box sx={{ gridColumn: { xs: "auto", sm: "span 2", md: "auto" } }}>
+                  <Box>
                     <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Customer Relationship Manager</Typography>
                     <Typography>{values.crmname}</Typography>
                   </Box>
                 )}
+
                 {isEditing ? (
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold", marginBottom: "5px" }}>
@@ -260,8 +786,8 @@ const TicketDetails = () => {
                           {...params}
                           sx={{
                             display: isEditing ? "block" : "none",
-                            '& .MuiInputBase-root': {  // Target the input container
-                              height: '40px',          // Adjust input height
+                            '& .MuiInputBase-root': {
+                              height: '40px',
                             }
                           }}
                           error={!!touched.priority && !!errors.priority}
@@ -272,12 +798,12 @@ const TicketDetails = () => {
                       disabled={!isEditing}
                       sx={{
                         gridColumn: "span 1",
-                        '& .MuiAutocomplete-listbox': {  // Target the dropdown list
-                          maxHeight: '200px',           // Set maximum height
-                          padding: 0,                   // Remove default padding
-                          '& .MuiAutocomplete-option': { // Target each option
-                            minHeight: '32px',          // Reduce option height
-                            padding: '4px 16px',        // Adjust padding
+                        '& .MuiAutocomplete-listbox': {
+                          maxHeight: '200px',
+                          padding: 0,
+                          '& .MuiAutocomplete-option': {
+                            minHeight: '32px',
+                            padding: '4px 16px',
                           }
                         }
                       }}
@@ -290,36 +816,58 @@ const TicketDetails = () => {
                   <Box>
                     <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Priority</Typography>
                     <Typography sx={{ color: getExperienceColor(values.priority) }}>{values.priority}</Typography>
-
                   </Box>
                 )}
 
-
-
                 {isEditing ? (
-                  <Box>
-                    <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Status</Typography>
-                    {/* <Typography>{values.status}</Typography> */}
-                    <TextField
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold", marginBottom: "5px" }}>
+                      Status
+                    </Typography>
+                    <Autocomplete
                       fullWidth
-                      placeholder="Type your message..."
-                      size="small"
-                      variant="outlined"
-                      value={values.status}
-                    // onChange={(e) => setNewMessage(e.target.value)}
-                    // onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                      options={status}
+                      value={values.status || null}
+                      onChange={(event, newValue) => {
+                        setFieldValue("status", newValue || "");
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          sx={{
+                            display: isEditing ? "block" : "none",
+                            '& .MuiInputBase-root': {
+                              height: '40px',
+                            }
+                          }}
+                          error={!!touched.status && !!errors.status}
+                          helperText={touched.status && errors.status}
+                          disabled={!isEditing}
+                        />
+                      )}
+                      disabled={!isEditing}
+                      sx={{
+                        gridColumn: "span 1",
+                        '& .MuiAutocomplete-listbox': {
+                          maxHeight: '200px',
+                          padding: 0,
+                          '& .MuiAutocomplete-option': {
+                            minHeight: '32px',
+                            padding: '4px 16px',
+                          }
+                        }
+                      }}
+                      freeSolo
+                      forcePopupIcon
+                      popupIcon={<ArrowDropDownIcon />}
                     />
                   </Box>
                 ) : (
                   <Box>
                     <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Status</Typography>
-                    <Typography>{values.status}</Typography>
+                    <Typography sx={{ color: getExperienceColor(values.priority) }}>{values.status}</Typography>
                   </Box>
                 )}
-
-
-
-
 
                 <Box>
                   <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Date</Typography>
@@ -330,7 +878,6 @@ const TicketDetails = () => {
                   <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Time</Typography>
                   <Typography>{values.time}</Typography>
                 </Box>
-
 
                 <Box>
                   <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Experience</Typography>
@@ -349,69 +896,12 @@ const TicketDetails = () => {
               </Box>
 
               <Box sx={{ mt: 3, display: "flex", flexDirection: "column", gap: 2 }}>
-                {/* Request Details Section with Edit Functionality */}
+                {/* Request Details Section */}
                 <Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="subtitle2" sx={{ color: "#555", fontWeight: "bold" }}>Request Details</Typography>
-                    {/* {!isEditing && (
-                      <Button
-                        variant="outlined"
-                        onClick={() => setIsEditing(true)}
-                        sx={{
-                          textTransform: 'none',
-                          color: colors.blueAccent[700],
-                          borderColor: colors.blueAccent[700],
-                          '&:hover': {
-                            backgroundColor: colors.blueAccent[50],
-                            borderColor: colors.blueAccent[700]
-                          }
-                        }}
-                      >
-                        Edit
-                      </Button>
-                    )} */}
                   </Box>
-
-                  {/* {!isEditing ? ( */}
                   <Typography sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>{values.requestdetails}</Typography>
-                  {/* ) : (
-                    <>
-                      <Box sx={{ mt: 2 }}>
-                        <JoditEditor
-                          value={values.requestdetails}
-                          config={config}
-                          onChange={(newContent) => { }}
-                        />
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => setIsEditing(false)}
-                          sx={{
-                            textTransform: 'none',
-                            color: colors.grey[700],
-                            borderColor: colors.grey[700]
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            // Handle save logic here
-                            setIsEditing(false);
-                          }}
-                          sx={{
-                            textTransform: 'none',
-                            backgroundColor: colors.blueAccent[700],
-                            '&:hover': { backgroundColor: colors.blueAccent[600] }
-                          }}
-                        >
-                          Save Changes
-                        </Button>
-                      </Box>
-                    </>
-                  )} */}
                 </Box>
 
                 {/* File Upload Section */}
@@ -473,6 +963,13 @@ const TicketDetails = () => {
                   </Button>
                 </Box>
 
+                {/* Task Fields */}
+
+
+
+
+
+
                 {/* Action Buttons */}
                 <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2, mt: 1 }}>
                   <Button
@@ -496,28 +993,8 @@ const TicketDetails = () => {
                     Delete
                   </Button>
 
-                  {/* <Button
-                    variant="contained"
-                    onClick={setIsEditing}
-                    sx={{
-                      padding: "12px 24px",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      borderRadius: "8px",
-                      boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                      transition: "0.3s",
-                      backgroundColor: colors.blueAccent[700],
-                      color: "#ffffff",
-                      textTransform: "none",
-                      "&:hover": {
-                        backgroundColor: colors.blueAccent[600],
-                        boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)"
-                      },
-                    }}
-                  >
 
-                    Edit
-                  </Button> */}
+
                   {isEditing ? (
                     <Box sx={{ display: "flex", gap: 2 }}>
                       <Button
@@ -563,32 +1040,32 @@ const TicketDetails = () => {
                         Save
                       </Button>
                     </Box>
-                  ) :
-                    (
-                      <Button
-                        variant="contained"
-                        onClick={setIsEditing}
-                        sx={{
-                          padding: "12px 24px",
-                          fontSize: "14px",
-                          fontWeight: "bold",
-                          borderRadius: "8px",
-                          boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
-                          transition: "0.3s",
-                          backgroundColor: colors.blueAccent[700],
-                          color: "#ffffff",
-                          textTransform: "none",
-                          "&:hover": {
-                            backgroundColor: colors.blueAccent[600],
-                            boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)"
-                          },
-                        }}
-                      >
-
-                        Edit
-                      </Button>
-                    )}
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={() => setIsEditing(true)}
+                      sx={{
+                        padding: "12px 24px",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        borderRadius: "8px",
+                        boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                        transition: "0.3s",
+                        backgroundColor: colors.blueAccent[700],
+                        color: "#ffffff",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: colors.blueAccent[600],
+                          boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)"
+                        },
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  )}
                 </Box>
+
+
               </Box>
             </form>
           )}
@@ -600,215 +1077,406 @@ const TicketDetails = () => {
         backgroundColor: "#ffffff",
         p: isDesktop ? 3 : 2,
         borderRadius: "8px",
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-        maxWidth: isLargeScreen ? "40%" : "100%",
-        width: isLargeScreen ? "40%" : "100%",
+        gridColumn: {
+          xs: '1 / -1',
+          md: '2 / 3'
+        },
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3
       }}>
-        {/* Customer Care Section */}
-
-
-        {/* Customer Chat Section */}
+        {/* Chat Section */}
         <Box sx={{
           p: 2,
           backgroundColor: "#f5f5f5",
-          borderRadius: "8px"
+          borderRadius: "8px",
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: isMobile ? '550px' : "",
+          maxHeight: isMobile ? '600px' : '620px'
         }}>
-          <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}> Chat</Typography>
-          <Typography sx={{ mb: 2 }}>Chat with our support team </Typography>
+          <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}> Discussions</Typography>
+          <Typography sx={{ mb: 2, color: colors.grey[600] }}>Discuss with Customer Support</Typography>
+
+          {/* Messages Display */}
           <Box sx={{
-            height: "200px",
+            flex: 1,
             backgroundColor: "white",
             borderRadius: "4px",
             p: 2,
             mb: 2,
             border: "1px solid #ddd",
-            overflowY: "auto"
+            overflowY: "auto",
+            minHeight: '200px',
+            maxHeight: '800px'
           }}>
             {messages.map((message, index) => (
-              <Box
-                key={index}
-                sx={{
-                  textAlign: message.sender === "user" ? "right" : "left",
-                  mb: 2
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "inline-block",
-                    p: 1.5,
-                    borderRadius: "4px",
-                    backgroundColor: message.sender === "user"
-                      ? colors.blueAccent[100]
-                      : "#f0f0f0",
-                    maxWidth: "80%",
-                    wordWrap: "break-word"
-                  }}
-                >
-                  <Typography variant="body2">{message.text}</Typography>
-                </Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: "block",
-                    color: colors.grey[600],
-                    mt: 0.5
-                  }}
-                >
+              <Box key={index} sx={{ mb: 2 }}>
+                <Typography variant="caption" sx={{ color: colors.grey[600] }}>
                   {message.sender === "user" ? "You" : "Support"}
                 </Typography>
+                <Box
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 1,
+                    bgcolor: message.sender === "user"
+                      ? colors.blueAccent[100]
+                      : "#f0f0f0",
+                    display: 'inline-block'
+                  }}
+                  dangerouslySetInnerHTML={{ __html: message.text }}
+                />
               </Box>
             ))}
           </Box>
-          <Box sx={{ display: "flex", gap: 1 }}>
-            {/* <TextField 
-      fullWidth 
-      placeholder="Type your message..." 
-      size="small"
-      variant="outlined"
-      value={newMessage}
-      onChange={(e) => setNewMessage(e.target.value)}
-      onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-    /> */}
 
-            <JoditEditor
-              value={newMessage}
-              onChange={(content) => setNewMessage(content)}
-              config={{
-                readonly: false,
-                toolbarButtonSize: "small",
-                showCharsCounter: false,
-                showWordsCounter: false,
-                showXPathInStatusbar: false,
-                buttons: [
-                  'bold',
-                  'italic',
-                  'underline',
-                  'strikethrough',
-                  '|',
-                  'ul',
-                  'ol',
-                  '|',
-                  'font',
-                  'fontsize',
-                  'paragraph',
-                  '|',
-                  'align',
-                  '|',
-                  'link',
-                  'file',
-                  'image',
-                  'media',
-                  'table',
-                  '|',
-                  'quote'
-                ],
-                buttonsMD: [
-                  'bold',
-                  'italic',
-                  'underline',
-                  'strikethrough',
-                  '|',
-                  'ul',
-                  'ol',
-                  '|',
-                  'font',
-                  'fontsize',
-                  'paragraph',
-                  '|',
-                  'align',
-                  '|',
-                  'link',
-                  'file',
-                  'image',
-                  'media',
-                  'table',
-                  '|',
-                  'quote'
-                ],
-                buttonsSM: [
-                  'bold',
-                  'italic',
-                  'underline',
-                  'strikethrough',
-                  '|',
-                  'ul',
-                  'ol',
-                  '|',
-                  'font',
-                  'fontsize',
-                  'paragraph',
-                  '|',
-                  'align',
-                  '|',
-                  'link',
-                  'file',
-                  'image',
-                  'media',
-                  'table',
-                  '|',
-                  'quote'
-                ],
-                buttonsXS: [
-                  'bold',
-                  'italic',
-                  'underline',
-                  'strikethrough',
-                  '|',
-                  'ul',
-                  'ol',
-                  '|',
-                  'font',
-                  'fontsize',
-                  'paragraph',
-                  '|',
-                  'align',
-                  '|',
-                  'link',
-                  'file',
-                  'image',
-                  'media',
-                  'table',
-                  '|',
-                  'quote'
-                ],
-                removeButtons: [
-                  'source',
-                  'fullsize',
-                  'print',
-                  'about',
-                  'outdent',
-                  'indent',
-                  'copyformat',
-                  'hr',
-                  'eraser',
-                  'dots',
-                  'brush',
-                  'symbol',
-                  'cut',
-                  'selectall'
-                ]
-              }}
-            />
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: colors.blueAccent[700],
-                color: "#ffffff",
-                '&:hover': { backgroundColor: colors.blueAccent[600] },
-                textTransform: 'none'
-              }}
-              onClick={handleSendMessage}
-              disabled={!newMessage.trim()}
-            >
-              Send
-            </Button>
+          {/* Tiptap Editor */}
+          <Box sx={{
+            backgroundColor: 'white',
+            borderRadius: '4px',
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Toolbar */}
+            {editor && (
+              <Box sx={{
+                display: 'flex',
+                gap: 1,
+                p: 1,
+                borderBottom: `1px solid ${colors.grey[300]}`,
+                flexWrap: 'wrap'
+              }}>
+                <IconButton
+                  onClick={() => editor.chain().focus().toggleBold().run()}
+                  color={editor.isActive('bold') ? 'primary' : 'default'}
+                  size="small"
+                >
+                  <FormatBold fontSize="small" />
+                </IconButton>
+
+                <IconButton
+                  onClick={() => editor.chain().focus().toggleItalic().run()}
+                  color={editor.isActive('italic') ? 'primary' : 'default'}
+                  size="small"
+                >
+                  <FormatItalic fontSize="small" />
+                </IconButton>
+
+                <IconButton
+                  onClick={() => editor.chain().focus().toggleUnderline().run()}
+                  color={editor.isActive('underline') ? 'primary' : 'default'}
+                  size="small"
+                >
+                  <FormatUnderlined fontSize="small" />
+                </IconButton>
+
+                <IconButton
+                  onClick={() => editor.chain().focus().toggleBulletList().run()}
+                  color={editor.isActive('bulletList') ? 'primary' : 'default'}
+                  size="small"
+                >
+                  <FormatListBulleted fontSize="small" />
+                </IconButton>
+
+                <IconButton
+                  onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                  color={editor.isActive('orderedList') ? 'primary' : 'default'}
+                  size="small"
+                >
+                  <FormatListNumbered fontSize="small" />
+                </IconButton>
+
+                <IconButton onClick={addImage} size="small">
+                  <InsertPhoto fontSize="small" />
+                </IconButton>
+
+                <IconButton onClick={addTable} size="small">
+                  <TableChart fontSize="small" />
+                </IconButton>
+
+                <IconButton onClick={addYoutubeVideo} size="small">
+                  <YouTube fontSize="small" />
+                </IconButton>
+              </Box>
+            )}
+
+            {/* Editor Content */}
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+              <Box sx={{
+                flex: 1,
+                p: 2,
+                minHeight: '100px',
+                maxHeight: '100px',
+                '& .tiptap': {
+                  minHeight: '200px',
+                  outline: 'none',
+                  '& p': {
+                    margin: 0,
+                    marginBottom: '0.5em'
+                  }
+                }
+              }}>
+                <EditorContent editor={editor} />
+              </Box>
+            </Box>
           </Box>
         </Box>
 
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          maxHeight: '100px',
+        }}>
+          <Button
+            variant="contained"
+            onClick={handleSendMessage}
+            disabled={!newMessage.trim()}
+            sx={{
+              backgroundColor: colors.blueAccent[700],
+              color: "#ffffff",
+              '&:hover': { backgroundColor: colors.blueAccent[600] },
+              textTransform: 'none',
+              minWidth: '100px'
+            }}
+          >
+            Send
+          </Button>
+        </Box>
       </Box>
+
+
+
+      {     /* Third Column - Task Management */}
+      <Box sx={{
+        backgroundColor: "#ffffff",
+        p: isDesktop ? 3 : 2,
+        borderRadius: "8px",
+        gridColumn: '1 / -1', // This makes it span all columns
+        mt: { xs: 3, md: 0 }
+      }}>
+        <Box sx={{ display: "flex", flexDirection: isMobile ? "column" :  "row"   , justifyContent: "flex-end", mb: 2, gap: 2 }}>
+
+
+
+          <Button
+            variant="contained"
+            sx={{
+              background: colors.blueAccent[500],
+              fontWeight: "bold",
+              color: "#ffffff",
+              whiteSpace: "nowrap",
+              textTransform: "none",
+              // width: isMobile ? "60%" : "100%",
+              '&:hover': {
+                backgroundColor: colors.blueAccent[600],
+              }
+            }}
+            startIcon={<AddIcon />}
+            onClick={() => setOpenTaskModal(true)}
+          >
+            Create New Task
+          </Button>
+        </Box>
+
+        <Box height="39vh" m="13px 0 0 0" sx={{
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none",
+            fontSize: "16px",
+            whiteSpace: "nowrap",
+            overflow: "visible",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: colors.blueAccent[700],
+            borderBottom: "none",
+            fontWeight: "bold !important",
+            fontSize: "16px !important",
+            color: "#ffffff",
+          },
+          "& .MuiDataGrid-columnSeparator": {
+            display: "none",
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold !important",
+          },
+          "& .MuiDataGrid-virtualScroller": {
+            backgroundColor: "#ffffff",
+          },
+          "& .MuiDataGrid-root::-webkit-scrollbar": {
+            display: "none !important",
+          },
+          "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+            display: "none !important",
+          },
+          "& .MuiDataGrid-root": {
+            "&:hover": {
+              cursor: "pointer",
+              backgroundColor: "#D9EAFD"
+            },
+          },
+          "& .MuiDataGrid-row": {
+            borderBottom: `0.5px solid ${colors.grey[300]}`,
+            "&:hover": {
+              cursor: "pointer",
+              backgroundColor: "#D9EAFD"
+            },
+          },
+          "& .MuiTablePagination-root": {
+            color: "#ffffff !important",
+          },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-input": {
+            color: "#ffffff !important",
+          },
+          "& .MuiTablePagination-displayedRows": {
+            color: "#ffffff !important",
+          },
+          "& .MuiSvgIcon-root": {
+            color: "#ffffff !important",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "none",
+            backgroundColor: colors.blueAccent[700],
+            color: "#ffffff",
+          },
+        }}>
+          <DataGrid
+            sx={{
+              "& .MuiDataGrid-cell": {
+                borderBottom: "none",
+                fontSize: "16px",
+                whiteSpace: "nowrap", // Prevent text wrapping
+                overflow: "visible", // Prevent text truncation
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: colors.blueAccent[700],
+                borderBottom: "none", // Remove the border below the header
+                fontWeight: "bold !important",
+                fontSize: "16px !important",
+                color: "#ffffff",
+              },
+              // "& .MuiDataGrid-root::-webkit-scrollbar-thumb":{
+              //    width: "2px !important",
+              //    height: "6px !important"
+              //  },
+              "& .MuiDataGrid-columnSeparator": {
+                display: "none", // Hide the column separator
+              },
+              // "& .MuiDataGrid-root::-webkit-scrollbar": {
+              //   display: "none", // Hides scrollbar in Chrome, Safari
+              // },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold !important", // Ensure header text is bold
+              },
+              // "& .MuiDataGrid-virtualScroller": {
+              //   backgroundColor: "#ffffff",
+              // },
+              "& .MuiDataGrid-root::-webkit-scrollbar": {
+                display: "none !important",
+              },
+              "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+                display: "none !important",
+              },
+              "& .MuiDataGrid-root": {
+                // scrollbarWidth: "none !important", // Hides scrollbar in Firefox
+                "&:hover": {
+                  cursor: "pointer",
+                  backgroundColor: "#D9EAFD"
+                },
+              },
+              "& .MuiDataGrid-virtualScroller": {
+                // scrollbarWidth: "none !important",
+                backgroundColor: "#ffffff",
+              },
+              "& .MuiDataGrid-row": {
+                borderBottom: `0.5px solid ${colors.grey[300]}`, // Add border to the bottom of each row
+                "&:hover": {
+                  cursor: "pointer",
+                  backgroundColor: "#D9EAFD"
+                },
+              },
+              "& .MuiTablePagination-root": {
+                color: "#ffffff !important", // Ensure pagination text is white
+              },
+              "& .MuiTablePagination-selectLabel, & .MuiTablePagination-input": {
+                color: "#ffffff !important", // Ensure select label and input text are white
+              },
+              "& .MuiTablePagination-displayedRows": {
+                color: "#ffffff !important", // Ensure displayed rows text is white
+              },
+              "& .MuiSvgIcon-root": {
+                color: "#ffffff !important", // Ensure pagination icons are white
+              },
+              "& .MuiDataGrid-footerContainer": {
+                display: "none",
+                borderTop: "none",
+                backgroundColor: colors.blueAccent[700],
+                color: "#ffffff",
+              },
+            }}
+            rows={initialTickets}
+            columns={columns}
+            // pageSize={10}
+            onRowClick={handleRowClick}
+          />
+        </Box>
+
+        <Box sx={{marginTop:"20px", margin:"15px"}}>  
+          <hr  />
+        </Box>
+
+        <Box sx={{ display: "flex", flexDirection: isMobile ? "column" :  "row"   , justifyContent: "center", mb: 2, gap: 2 , marginTop:"20px"}}>
+        <Button
+            variant="contained"
+            sx={{
+              background: colors.blueAccent[500],
+              fontWeight: "bold",
+              color: "#ffffff",
+              whiteSpace: "nowrap",
+              textTransform: "none",
+              padding:"14px 25px", 
+              // width: isMobile ? "60%" : "100%",
+              '&:hover': {
+                backgroundColor: colors.blueAccent[600],
+              }
+            }}
+            // startIcon={<AddIcon />}
+            onClick={() => setshareEntireExperience(true)}
+          >
+            Assign To
+          </Button>
+          </Box>
+                <Modal
+                  open={openTaskModal}
+                  onClose={() => setOpenTaskModal(false)}
+                  aria-labelledby="task-modal-title"
+                  aria-describedby="task-modal-description"
+                >
+                  <Box sx={createtaskmodel}>
+                    <Typography id="task-modal-title" variant="h5" component="h2" sx={{ mb: 3 }}>
+                      Create New Task
+                    </Typography>
+                    <TaskForm handleClose={() => setOpenTaskModal(false)} />
+                  </Box>
+                </Modal>
+
+
+                <Modal
+                  open={shareEntireExperience}
+                  onClose={() => setshareEntireExperience(false)}
+                  aria-labelledby="task-modal-title"
+                  aria-describedby="task-modal-description"
+                >
+                  <Box sx={assignmodel}>
+                    <Typography id="task-modal-title" variant="h5" component="h2" sx={{ mb: 3 }}>
+                      Assign To Customer Relationship Manager
+                    </Typography>
+                    <AssignCrm handleClose={() => setshareEntireExperience(false)} />
+                  </Box>
+                </Modal>
+
+
+      </Box>
+
     </Box>
   );
 };

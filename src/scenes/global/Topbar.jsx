@@ -40,6 +40,7 @@ const getActivePage = (pathname) => {
     pathname.includes("/allExperiences") ||
     pathname.includes("/newExperiences") ||
     pathname.includes("/profile") ||
+    pathname.includes("/taskdetails") ||
     pathname.includes("/pendingExperiences") ||
     pathname.includes("/resolvedExperiences")
   ) {

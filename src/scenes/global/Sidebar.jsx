@@ -25,7 +25,7 @@ const getActivePage = (pathname) => {
     return "/hob";
   } else if (pathname.includes("/notes")) {
     return "/notes";
-  }else if (pathname.includes("/tasks") || pathname.includes("/taskform") || pathname.includes("/taskdetails")) {
+  }else if (pathname.includes("/tasks") || pathname.includes("/taskform") ) {
     return "/tasks";
   }
    else if (pathname.includes("/calendar")) {
@@ -37,6 +37,7 @@ const getActivePage = (pathname) => {
     pathname === "/" ||
     pathname.includes("/allExperiences") ||
     pathname.includes("/ticketdetails") ||
+    pathname.includes("/taskdetails") ||
     pathname.includes("/newExperiences") ||
     pathname.includes("/pendingExperiences") ||
     pathname.includes("/profile") ||

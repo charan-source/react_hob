@@ -447,6 +447,28 @@ const TicketDetails = () => {
               </Box>
 
               <Box display="flex" justifyContent="flex-end" mt="20px" gap={2}>
+              <Button
+                type="submit"
+                variant="contained"
+                onClick={() => setOpenTaskModal(false)}
+                sx={{
+                  padding: "12px 24px",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                  transition: "0.3s",
+                  backgroundColor: colors.redAccent[300],
+                  color: "#ffffff",
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: colors.redAccent[700],
+                    boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)"
+                  },
+                }}
+              >
+                Cancel
+              </Button>
                 <Button
                   type="submit"
                   variant="contained"
@@ -588,6 +610,28 @@ const AssignCrm = ({ handleClose }) => {
             </Box>
 
             <Box display="flex" justifyContent="flex-end" mt="20px" gap={2}>
+            <Button
+                type="submit"
+                variant="contained"
+                onClick={() => setshareEntireExperience(false)}
+                sx={{
+                  padding: "12px 24px",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                  boxShadow: "3px 3px 6px rgba(0, 0, 0, 0.2)",
+                  transition: "0.3s",
+                  backgroundColor: colors.redAccent[300],
+                  color: "#ffffff",
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: colors.redAccent[700],
+                    boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)"
+                  },
+                }}
+              >
+                Cancel
+              </Button>
               <Button
                 type="submit"
                 variant="contained"
